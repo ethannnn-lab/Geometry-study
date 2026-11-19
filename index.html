@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Geometry Study</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: graph-paper notebook. A home board of study modes, each mode opens in its own focused view. */
+:root {
+  --paper: #f5f7fb;
+  --grid: #e1e7f1;
+  --card: #ffffff;
+  --fg: #1c2742;
+  --muted: #5a6683;
+  --line: #ccd5e3;
+  --accent: #2a56c6;
+  --accent-soft: #e3eafc;
+  --pop: #ffd23f;
+  --on-pop: #231d05;
+  --good: #16865a;
+  --good-soft: #dcf3e8;
+  --bad: #cc3550;
+  --bad-soft: #fbe2e7;
+  --tile-a: #e3eafc;
+  --tile-b: #fff1bf;
+  --tile-c: #dcf3e8;
+  --tile-d: #fbe2e7;
+  --water: rgba(42, 86, 198, 0.16);
+  --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111726; --grid: #1a2235; --card: #182032; --fg: #e7ecf6; --muted: #9ba7c0;
+    --line: #2b3650; --accent: #86a8ff; --accent-soft: #1f2c4d; --pop: #ffd75e; --on-pop: #231d05;
+    --good: #4fd39b; --good-soft: #143a2c; --bad: #ff7d92; --bad-soft: #43202a;
+    --tile-a: #1f2c4d; --tile-b: #3a3214; --tile-c: #143a2c; --tile-d: #43202a;
+    --water: rgba(134, 168, 255, 0.18); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111726; --grid: #1a2235; --card: #182032; --fg: #e7ecf6; --muted: #9ba7c0;
+  --line: #2b3650; --accent: #86a8ff; --accent-soft: #1f2c4d; --pop: #ffd75e; --on-pop: #231d05;
+  --good: #4fd39b; --good-soft: #143a2c; --bad: #ff7d92; --bad-soft: #43202a;
+  --tile-a: #1f2c4d; --tile-b: #3a3214; --tile-c: #143a2c; --tile-d: #43202a;
+  --water: rgba(134, 168, 255, 0.18); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0;
+}
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 96px;
+}
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+p { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, .choice:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.seg { text-decoration: overline; text-decoration-thickness: 1.5px; }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- header ---------- */
+.top { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; justify-content: space-between; }
+.brand h1 { font-size: clamp(2.3rem, 7vw, 3.6rem); font-weight: 800; letter-spacing: -0.02em; }
+.brand h1 .hl { background: linear-gradient(transparent 58%, var(--pop) 58%, var(--pop) 90%, transparent 90%); padding: 0 4px; }
+.brand p { color: var(--muted); margin-top: 6px; max-width: 52ch; }
+.stats { display: flex; gap: 10px; flex-wrap: wrap; }
+.stat {
+  background: var(--card); border: 1.5px solid var(--line); border-radius: 12px;
+  padding: 8px 14px; min-width: 92px;
+}
+.stat .k { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.stat .v { font-family: var(--mono); font-weight: 700; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.stat.level .v { font-family: var(--display); font-size: 1.05rem; padding-top: 3px; }
+.xpbar { height: 6px; border-radius: 3px; background: var(--accent-soft); margin-top: 6px; overflow: hidden; }
+.xpbar i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .4s; }
+
+/* ---------- mode grid ---------- */
+.section-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; margin: 34px 0 12px; }
+.modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.mode {
+  text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: 16px;
+  padding: 18px; display: flex; flex-direction: column; gap: 10px;
+  transition: transform .15s, border-color .15s, box-shadow .15s;
+}
+.mode:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 6px 0 var(--accent-soft); }
+.mode .ico { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; }
+.mode .ico svg { width: 30px; height: 30px; stroke: var(--fg); fill: none; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+.mode h3 { font-size: 1.2rem; }
+.mode p { color: var(--muted); font-size: 0.93rem; }
+.mode .meta { margin-top: auto; font-family: var(--mono); font-size: 0.78rem; color: var(--accent); font-weight: 700; }
+.ta { background: var(--tile-a); } .tb { background: var(--tile-b); } .tc { background: var(--tile-c); } .td { background: var(--tile-d); }
+
+/* ---------- cheat sheet ---------- */
+.sheet { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 14px; }
+.panel { background: var(--card); border: 1.5px solid var(--line); border-radius: 16px; padding: 18px; min-width: 0; }
+.panel h3 { font-size: 1.1rem; margin-bottom: 10px; }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { padding: 7px 8px; border-bottom: 1px solid var(--line); text-align: center; }
+th:first-child, td:first-child { text-align: left; }
+th { font-family: var(--display); font-size: 0.85rem; }
+td.y { color: var(--good); font-weight: 700; }
+td.n { color: var(--muted); }
+.formulas { display: flex; flex-direction: column; gap: 9px; font-size: 0.93rem; }
+.formulas div { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed var(--line); padding-bottom: 7px; }
+.formulas b { font-weight: 700; }
+.formulas span { font-family: var(--mono); font-size: 0.84rem; text-align: right; }
+.note {
+  margin-top: 14px; background: var(--tile-b); border-radius: 10px; padding: 10px 12px; font-size: 0.92rem;
+}
+.note b { font-family: var(--display); }
+.ways { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: 0.93rem; }
+
+/* ---------- shared play chrome ---------- */
+.back { background: none; border: none; color: var(--accent); font-weight: 700; padding: 6px 0; margin-bottom: 14px; }
+.playhead { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.playhead h2 { font-size: 1.6rem; }
+.count { font-family: var(--mono); color: var(--muted); font-size: 0.88rem; }
+.prog { height: 8px; background: var(--accent-soft); border-radius: 4px; overflow: hidden; margin-bottom: 18px; }
+.prog i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+.stage { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: clamp(16px, 4vw, 28px); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.chip { font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+.chip.src { background: var(--tile-b); color: var(--fg); }
+.chip.real { background: var(--pop); color: var(--on-pop); }
+.qtext { font-size: 1.12rem; max-width: 65ch; }
+.fig { margin: 16px 0 4px; overflow-x: auto; }
+.fig svg { display: block; max-width: 100%; height: auto; }
+.fig .s { stroke: var(--fg); fill: none; stroke-width: 2; }
+.fig .d { stroke: var(--accent); fill: none; stroke-width: 2; stroke-dasharray: 6 5; }
+.fig .h { stroke: var(--muted); fill: none; stroke-width: 1.5; stroke-dasharray: 4 4; }
+.fig .w { fill: var(--water); stroke: none; }
+.fig .pt { fill: var(--fg); stroke: none; }
+.fig text { fill: var(--fg); font-family: var(--mono); font-size: 14px; font-weight: 700; }
+.fig text.lbl { fill: var(--muted); font-weight: 500; font-size: 13px; }
+.choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+.choice {
+  display: flex; gap: 10px; align-items: flex-start; text-align: left; padding: 12px 14px;
+  border: 1.5px solid var(--line); border-radius: 12px; background: var(--paper); min-width: 0;
+  transition: border-color .12s, background .12s, transform .12s;
+}
+.choice:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-1px); }
+.choice .num { font-family: var(--mono); font-weight: 700; color: var(--accent); flex: none; }
+.choice.right { border-color: var(--good); background: var(--good-soft); }
+.choice.right .num { color: var(--good); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.choice.wrong .num { color: var(--bad); }
+.choice:disabled { cursor: default; }
+.feedback { margin-top: 16px; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+.feedback.ok { background: var(--good-soft); }
+.feedback.no { background: var(--bad-soft); }
+.feedback strong { font-family: var(--display); font-size: 1.1rem; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.btn {
+  border: none; border-radius: 12px; padding: 11px 18px; font-weight: 700;
+  background: var(--accent); color: var(--card);
+}
+.btn.pop { background: var(--pop); color: var(--on-pop); }
+.btn.ghost { background: transparent; border: 1.5px solid var(--line); color: var(--fg); }
+.kbd { color: var(--muted); font-size: 0.8rem; margin-top: 10px; }
+
+/* end screen */
+.end { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.big { font-family: var(--display); font-size: clamp(3rem, 12vw, 5rem); font-weight: 800; line-height: 1; }
+.end .row { justify-content: center; }
+.missed { text-align: left; width: 100%; margin-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.missed .m { border: 1.5px solid var(--line); border-radius: 12px; padding: 12px 14px; font-size: 0.93rem; }
+.missed .m .a { color: var(--good); font-weight: 700; margin-top: 4px; }
+
+/* flashcards */
+.flip { perspective: 1200px; cursor: pointer; border: none; background: none; padding: 0; width: 100%; display: block; }
+.flip .inner { position: relative; min-height: 240px; transition: transform .5s; transform-style: preserve-3d; }
+.flip.on .inner { transform: rotateY(180deg); }
+.face {
+  position: absolute; inset: 0; backface-visibility: hidden; border-radius: 18px; border: 1.5px solid var(--line);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px; padding: 22px;
+}
+.face.front { background: var(--card); }
+.face.back { background: var(--tile-b); transform: rotateY(180deg); }
+.face .term { font-family: var(--display); font-size: clamp(1.6rem, 6vw, 2.3rem); font-weight: 800; }
+.face .hint { color: var(--muted); font-size: 0.85rem; }
+.face .def { font-size: 1.08rem; max-width: 48ch; }
+
+/* speed round */
+.timer { font-family: var(--mono); font-size: 2rem; font-weight: 700; }
+.timer.low { color: var(--bad); }
+.tf { font-family: var(--display); font-size: clamp(1.3rem, 4.5vw, 1.8rem); font-weight: 700; min-height: 4.5em; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; }
+.tfbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tfbtns button { padding: 18px; border-radius: 14px; border: none; font-family: var(--display); font-size: 1.3rem; font-weight: 800; }
+.tfbtns .t { background: var(--good-soft); color: var(--good); }
+.tfbtns .f { background: var(--bad-soft); color: var(--bad); }
+.flash-ok { animation: okp .35s; } .flash-no { animation: shake .35s; }
+@keyframes okp { 50% { transform: scale(1.03); } }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+/* proofs */
+.proofpick { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.gp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: center; }
+.gp dl { margin: 0; display: grid; gap: 6px; }
+.gp dt { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 700; }
+.gp dd { margin: 0 0 6px; font-weight: 700; }
+.ptable { margin-top: 16px; width: 100%; }
+.ptable th { text-align: left; }
+.ptable td { text-align: left; vertical-align: top; }
+.ptable td:first-child { width: 32px; font-family: var(--mono); color: var(--muted); }
+.ptable tr.cur td { background: var(--tile-b); }
+.reasons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+
+/* footer badge */
+.madeby {
+  position: fixed;
+  right: calc(14px + env(safe-area-inset-right, 0px));
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  background: var(--fg); color: var(--paper);
+  font-family: var(--display); font-weight: 700; font-size: 0.9rem;
+  padding: 7px 14px; border-radius: 99px; transform: rotate(-2deg);
+  box-shadow: 3px 3px 0 var(--pop); z-index: 5;
+}
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
+
+@media (max-width: 760px) {
+  .modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sheet, .gp { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  .modes, .choices, .reasons, .proofpick { grid-template-columns: minmax(0, 1fr); }
+  .stat { min-width: 0; flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<main>
+
+<!-- ================= HOME ================= -->
+<section id="home">
+  <header class="top">
+    <div class="brand">
+      <h1><span class="hl">Geometry</span> Study</h1>
+      <p>Unit 2 parallelograms and the June 23, 2026 Regents. Pick a mode and start earning points.</p>
+    </div>
+    <div class="stats" aria-live="polite">
+      <div class="stat level"><div class="k">Rank</div><div class="v" id="rank">Point</div><div class="xpbar"><i id="xpbar"></i></div></div>
+      <div class="stat"><div class="k">Points</div><div class="v" id="xp">0</div></div>
+      <div class="stat"><div class="k">Best streak</div><div class="v" id="best">0</div></div>
+    </div>
+  </header>
+
+  <div class="section-label">Study modes</div>
+  <div class="modes">
+    <button class="mode" data-go="para">
+      <span class="ico ta"><svg viewBox="0 0 32 32"><path d="M4 26 L11 6 H28 L21 26 Z"/><path d="M4 26 L28 6" stroke-dasharray="3 3"/></svg></span>
+      <h3>Parallelogram Quiz</h3>
+      <p>Angles, diagonals, coordinates and proof reasons from Unit 2 Lesson 14.</p>
+      <span class="meta">10 questions</span>
+    </button>
+    <button class="mode" data-go="regents">
+      <span class="ico tb"><svg viewBox="0 0 32 32"><path d="M8 3 H20 L26 9 V29 H8 Z"/><path d="M20 3 V9 H26"/><path d="M12 15 H22 M12 20 H22 M12 25 H18"/></svg></span>
+      <h3>Regents Practice</h3>
+      <p>The 4 questions from your June 23, 2026 exam, plus 6 more in the same style.</p>
+      <span class="meta">10 questions</span>
+    </button>
+    <button class="mode" data-go="proof">
+      <span class="ico tc"><svg viewBox="0 0 32 32"><path d="M5 8 L9 12 L15 5"/><path d="M5 18 L9 22 L15 15"/><path d="M19 9 H28 M19 19 H28 M5 28 H28"/></svg></span>
+      <h3>Proof Builder</h3>
+      <p>Pick the reason for each step, like the diagonals proof from Activity 3.</p>
+      <span class="meta">2 proofs</span>
+    </button>
+    <button class="mode" data-go="cards">
+      <span class="ico td"><svg viewBox="0 0 32 32"><rect x="8" y="9" width="20" height="16" rx="2"/><path d="M4 21 V7 A2 2 0 0 1 6 5 H22"/></svg></span>
+      <h3>Flashcards</h3>
+      <p>Vocab and theorems. Flip each card, then sort it: know it or still learning.</p>
+      <span class="meta" id="cardMeta">cards</span>
+    </button>
+    <button class="mode" data-go="speed">
+      <span class="ico tb"><svg viewBox="0 0 32 32"><circle cx="16" cy="18" r="11"/><path d="M16 18 L21 12 M13 3 H19 M16 3 V7"/></svg></span>
+      <h3>Speed Round</h3>
+      <p>True or false, as many as you can in 60 seconds. Beat your best.</p>
+      <span class="meta" id="speedMeta">60 seconds</span>
+    </button>
+    <button class="mode" data-go="mixed">
+      <span class="ico ta"><svg viewBox="0 0 32 32"><path d="M4 27 L11 14 L18 27 Z"/><circle cx="23" cy="9" r="5"/><rect x="4" y="4" width="9" height="7"/><rect x="19" y="19" width="9" height="8"/></svg></span>
+      <h3>Mixed Review</h3>
+      <p>12 random questions pulled from every mode. Good for a last check.</p>
+      <span class="meta">12 questions</span>
+    </button>
+  </div>
+
+  <div class="section-label">Cheat sheet</div>
+  <div class="sheet">
+    <div class="panel">
+      <h3>The parallelogram family</h3>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>Property</th><th>Parallelogram</th><th>Rectangle</th><th>Rhombus</th><th>Square</th></tr></thead>
+          <tbody id="propTable"></tbody>
+        </table>
+      </div>
+      <div class="note"><b>Your note from Activity 3:</b> Bisect = 2 equal pieces. If diagonals bisect each other, they cut each other exactly in half at the middle point.</div>
+    </div>
+    <div class="panel">
+      <h3>Formulas to know</h3>
+      <div class="formulas">
+        <div><b>Midsegment</b><span>DE = ½ · third side</span></div>
+        <div><b>SOH CAH TOA</b><span>sin=O/H cos=A/H tan=O/A</span></div>
+        <div><b>Prism volume</b><span>V = l · w · h</span></div>
+        <div><b>Cylinder volume</b><span>V = πr²h</span></div>
+        <div><b>Midpoint</b><span>((x₁+x₂)/2, (y₁+y₂)/2)</span></div>
+        <div><b>Slope</b><span>(y₂−y₁)/(x₂−x₁)</span></div>
+        <div><b>Distance</b><span>√((Δx)² + (Δy)²)</span></div>
+        <div><b>Dilation by k</b><span>lengths ×k, area ×k²</span></div>
+      </div>
+      <h3 style="margin-top:16px">Ways to prove it's a parallelogram</h3>
+      <ul class="ways">
+        <li>Both pairs of opposite sides are parallel</li>
+        <li>Both pairs of opposite sides are congruent</li>
+        <li>One pair of sides is both parallel and congruent</li>
+        <li>Diagonals bisect each other</li>
+        <li>Both pairs of opposite angles are congruent</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section id="quiz" hidden>
+  <button class="back" data-home>← All modes</button>
+  <div class="playhead"><h2 id="qTitle">Quiz</h2><span class="count" id="qCount"></span></div>
+  <div class="prog"><i id="qProg"></i></div>
+  <div class="stage" id="qStage">
+    <div class="chips" id="qTags"></div>
+    <p class="qtext" id="qText"></p>
+    <div class="fig" id="qFig" hidden></div>
+    <div class="choices" id="qChoices"></div>
+    <div class="feedback" id="qFeedback" hidden></div>
+    <div class="row" id="qNextRow" hidden><button class="btn" id="qNext">Next</button></div>
+    <p class="kbd">Tip: press 1–4 to answer and Enter for next.</p>
+  </div>
+  <div class="stage end" id="qEnd" hidden></div>
+</section>
+
+<!-- ================= FLASHCARDS ================= -->
+<section id="cards" hidden>
+  <button class="back" data-home>← All modes</button>
+  <div class="playhead"><h2>Flashcards</h2><span class="count" id="fcCount"></span></div>
+  <div class="prog"><i id="fcProg"></i></div>
+  <div id="fcPlay">
+    <button class="flip" id="fcCard" aria-label="Flip card">
+      <div class="inner">
+        <div class="face front"><div class="term" id="fcTerm"></div><div class="hint">Tap to flip</div></div>
+        <div class="face back"><div class="def" id="fcDef"></div></div>
+      </div>
+    </button>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" id="fcAgain">Still learning</button>
+      <button class="btn" id="fcKnow">I know it</button>
+    </div>
+    <p class="kbd" style="text-align:center">Space flips the card. ← still learning, → I know it.</p>
+  </div>
+  <div class="stage end" id="fcEnd" hidden></div>
+</section>
+
+<!-- ================= SPEED ================= -->
+<section id="speed" hidden>
+  <button class="back" data-home>← All modes</button>
+  <div class="playhead"><h2>Speed Round</h2><span class="timer" id="spTimer">60</span></div>
+  <div class="prog"><i id="spProg"></i></div>
+  <div class="stage" id="spPlay">
+    <div class="chips"><span class="chip" id="spScore">Score 0</span></div>
+    <div class="tf" id="spText"></div>
+    <div class="tfbtns"><button class="t" id="spT">True</button><button class="f" id="spF">False</button></div>
+    <p class="kbd">Keyboard: T or ← for true, F or → for false.</p>
+  </div>
+  <div class="stage end" id="spEnd" hidden></div>
+</section>
+
+<!-- ================= PROOF ================= -->
+<section id="proof" hidden>
+  <button class="back" data-home>← All modes</button>
+  <div class="playhead"><h2 id="pfTitle">Proof Builder</h2><span class="count" id="pfCount"></span></div>
+  <div class="stage" id="pfPick"></div>
+  <div class="stage" id="pfPlay" hidden>
+    <div class="gp">
+      <dl><dt>Given</dt><dd id="pfGiven"></dd><dt>Prove</dt><dd id="pfProve"></dd></dl>
+      <div class="fig" id="pfFig"></div>
+    </div>
+    <div class="tablewrap">
+      <table class="ptable"><thead><tr><th>#</th><th>Statement</th><th>Reason</th></tr></thead><tbody id="pfRows"></tbody></table>
+    </div>
+    <div id="pfAsk"></div>
+  </div>
+</section>
+
+</main>
+
+<div class="madeby">made by ethan w</div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<script>
+/* ---------- figures ---------- */
+const FIG = {
+  midseg: `<svg viewBox="0 0 320 262" width="320" role="img" aria-label="Triangle ABC with midpoints D on CA and E on CB">
+    <polygon class="s" points="40,25 95,205 295,240"/>
+    <line class="s" x1="67.5" y1="115" x2="167.5" y2="132.5"/>
+    <circle class="pt" cx="67.5" cy="115" r="3.5"/><circle class="pt" cx="167.5" cy="132.5" r="3.5"/>
+    <text x="26" y="22">C</text><text x="84" y="228">A</text><text x="290" y="258">B</text>
+    <text x="48" y="120">D</text><text x="168" y="154">E</text></svg>`,
+  trig: `<svg viewBox="0 0 300 180" width="300" role="img" aria-label="Right triangle RJM, right angle at R, MR is 7.25 inches">
+    <polygon class="s" points="30,140 250,140 250,30"/>
+    <path class="s" d="M236 140 V126 H250"/>
+    <text x="12" y="146">M</text><text x="258" y="150">R</text><text x="256" y="28">J</text>
+    <text class="lbl" x="110" y="162">7.25 in</text><text class="lbl" x="66" y="134">35°</text></svg>`,
+  tank: `<svg viewBox="0 0 320 200" width="320" role="img" aria-label="Fish tank 35 by 17 by 25 centimeters, water 3 cm below the top">
+    <rect class="w" x="20" y="64" width="200" height="106"/>
+    <line class="h" x1="20" y1="170" x2="60" y2="145"/><line class="h" x1="60" y1="145" x2="260" y2="145"/><line class="h" x1="60" y1="25" x2="60" y2="145"/>
+    <rect class="s" x="20" y="50" width="200" height="120"/>
+    <polyline class="s" points="20,50 60,25 260,25 220,50"/><polyline class="s" points="260,25 260,145 220,170"/>
+    <line class="d" x1="20" y1="64" x2="220" y2="64"/>
+    <text class="lbl" x="95" y="190">35 cm</text><text class="lbl" x="246" y="174">17 cm</text><text class="lbl" x="268" y="92">25 cm</text></svg>`,
+  wxyz: `<svg viewBox="0 0 300 180" width="300" role="img" aria-label="Parallelogram WXYZ with diagonals meeting at P">
+    <polygon class="s" points="70,30 270,30 230,150 30,150"/>
+    <line class="d" x1="70" y1="30" x2="230" y2="150"/><line class="d" x1="270" y1="30" x2="30" y2="150"/>
+    <circle class="pt" cx="150" cy="90" r="3.5"/>
+    <text x="54" y="24">W</text><text x="274" y="24">X</text><text x="236" y="170">Y</text><text x="14" y="170">Z</text><text x="144" y="116">P</text></svg>`,
+  abcd: `<svg viewBox="0 0 300 180" width="300" role="img" aria-label="Parallelogram ABCD with diagonal AC">
+    <polygon class="s" points="30,150 70,30 270,30 230,150"/>
+    <line class="d" x1="30" y1="150" x2="270" y2="30"/>
+    <text x="14" y="170">A</text><text x="54" y="24">B</text><text x="274" y="24">C</text><text x="236" y="170">D</text></svg>`
+};
+const s = t => `<span class="seg">${t}</span>`;
+
+/* ---------- questions ---------- */
+const REAL = 'June ’26 Regents';
+const Q = [
+  // From the June 23, 2026 Regents (photos)
+  { set: 'real', src: REAL + ' #1', topic: 'Transformations',
+    q: "Which transformation would result in the area of a rectangle's image being different from the area of its pre-image?",
+    c: ['a reflection over the y-axis', 'a translation 4 units to the right', 'a rotation of 90° counterclockwise about the origin', 'a vertical stretch of scale factor 3 with respect to y = 0'], a: 3,
+    ex: 'Reflections, translations and rotations are rigid motions. They keep size and shape the same, so area stays the same. A vertical stretch by 3 makes the height 3 times bigger, so the area triples.' },
+  { set: 'real', src: REAL + ' #2', topic: 'Midsegments', fig: 'midseg',
+    q: `In the diagram of △ABC, points D and E are the midpoints of ${s('CA')} and ${s('CB')}, respectively. Which statement must always be true?`,
+    c: ['DE = ½AB', 'DE = ½AC', 'AD = ½AB', 'AB = ½DE'], a: 0,
+    ex: `D and E are midpoints of two sides, so ${s('DE')} is a midsegment. A midsegment is parallel to the third side (${s('AB')}) and half as long. Choice (4) is backwards: AB = 2·DE.` },
+  { set: 'real', src: REAL + ' #3', topic: 'Trigonometry', fig: 'trig',
+    q: `In triangle RJM, m∠R = 90° and MR = 7.25 inches. If the measure of angle M is 35°, what is the length of ${s('MJ')}, to the nearest hundredth of an inch?`,
+    c: ['4.16', '5.94', '8.85', '12.64'], a: 2,
+    ex: `${s('MR')} is adjacent to ∠M, and ${s('MJ')} is the hypotenuse (it is across from the right angle). Use CAH: cos 35° = 7.25 ÷ MJ, so MJ = 7.25 ÷ cos 35° ≈ 7.25 ÷ 0.8192 ≈ 8.85. The wrong choices come from using sin or multiplying instead of dividing.` },
+  { set: 'real', src: REAL + ' #4', topic: 'Volume', fig: 'tank',
+    q: 'A fish tank shaped like a rectangular prism is 35 cm long, 17 cm wide and 25 cm high. If it is filled with water to a height 3 cm from the top, how many liters of water are in the tank, to the nearest liter? [1 liter = 1000 cm³]',
+    c: ['10', '13', '15', '17'], a: 1,
+    ex: 'The water is 25 − 3 = 22 cm deep. V = 35 · 17 · 22 = 13,090 cm³. Divide by 1000 to get 13.09, so about 13 liters. Choice (3) is the trap: it uses the full 25 cm.' },
+
+  // Unit 2 parallelograms, Regents style
+  { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Angles',
+    q: 'In parallelogram ABCD, m∠A = (3x + 10)° and m∠C = (5x − 30)°. What is m∠A?',
+    c: ['20°', '70°', '110°', '140°'], a: 1,
+    ex: 'Opposite angles of a parallelogram are congruent, so 3x + 10 = 5x − 30. That gives 40 = 2x, so x = 20. Then m∠A = 3(20) + 10 = 70°. Choice (1) is x, not the angle.' },
+  { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Diagonals',
+    q: `The diagonals of parallelogram ABCD meet at E. If AE = 2x + 4 and EC = 5x − 11, what is AC?`,
+    c: ['5', '14', '28', '33'], a: 2,
+    ex: 'Diagonals of a parallelogram bisect each other, so AE = EC. 2x + 4 = 5x − 11 gives x = 5, so AE = 14. AC is the whole diagonal: 14 + 14 = 28.' },
+  { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Angles',
+    q: 'In parallelogram ABCD, m∠A = (2x + 30)° and m∠B = (4x)°. What is m∠B?',
+    c: ['25°', '80°', '100°', '120°'], a: 2,
+    ex: '∠A and ∠B are consecutive angles, so they are supplementary (add to 180°). 2x + 30 + 4x = 180, so 6x = 150 and x = 25. m∠B = 4(25) = 100°.' },
+  { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Properties',
+    q: 'Which statement is NOT always true for every parallelogram?',
+    c: ['Opposite sides are congruent.', 'Opposite angles are congruent.', 'The diagonals are congruent.', 'The diagonals bisect each other.'], a: 2,
+    ex: 'Congruent diagonals only happen in rectangles (and squares). A slanted parallelogram has one long diagonal and one short one.' },
+  { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Special parallelograms',
+    q: `Parallelogram ABCD has diagonals ${s('AC')} and ${s('BD')} with AC = BD. Which type of quadrilateral must ABCD be?`,
+    c: ['rectangle', 'rhombus', 'square', 'trapezoid'], a: 0,
+    ex: 'A parallelogram with congruent diagonals is a rectangle. It might also be a square, but it does not have to be, so "rectangle" is what must be true.' },
+  { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Special parallelograms',
+    q: 'A parallelogram has diagonals that are perpendicular to each other. Which type of quadrilateral must it be?',
+    c: ['rectangle', 'rhombus', 'square', 'trapezoid'], a: 1,
+    ex: 'Perpendicular diagonals in a parallelogram make it a rhombus. A square has that too, but you would also need right angles to call it a square.' },
+  { set: 'para', src: 'Regents style', topic: 'Coordinate geometry',
+    q: 'Quadrilateral ABCD has vertices A(0, 0), B(4, 0), C(6, 3) and D(2, 3). Which statement best describes ABCD?',
+    c: ['It is a parallelogram, but not a rectangle or a rhombus.', 'It is a rectangle.', 'It is a rhombus.', 'It is a square.'], a: 0,
+    ex: `Slopes: ${s('AB')} and ${s('DC')} are both 0; ${s('AD')} and ${s('BC')} are both 3/2. Two pairs of parallel sides make a parallelogram. AB = 4 but AD = √13 ≈ 3.6, so the sides are not all equal (not a rhombus). Slopes 0 and 3/2 are not perpendicular, so there are no right angles (not a rectangle).` },
+  { set: 'para', src: 'Regents style', topic: 'Coordinate geometry',
+    q: 'Parallelogram ABCD has vertices A(−2, 1), B(4, 3) and C(6, −1). What are the coordinates of D?',
+    c: ['(0, −3)', '(12, 1)', '(−4, 5)', '(2, −1)'], a: 0,
+    ex: `The diagonals bisect each other, so they share a midpoint. Midpoint of ${s('AC')} = ((−2+6)/2, (1−1)/2) = (2, 0). For ${s('BD')}: (4 + x)/2 = 2 gives x = 0, and (3 + y)/2 = 0 gives y = −3. So D = (0, −3).` },
+  { set: 'para', src: 'Regents style', topic: 'Transformations',
+    q: 'Which transformation always carries a parallelogram onto itself?',
+    c: ['a reflection over one of its diagonals', 'a rotation of 90° about the intersection of its diagonals', 'a rotation of 180° about the intersection of its diagonals', 'a reflection over a line through the midpoints of two opposite sides'], a: 2,
+    ex: 'Every parallelogram has 180° rotational symmetry around the point where its diagonals cross. Reflections and 90° turns only work for special cases like rhombuses, rectangles or squares.' },
+  { set: 'para', src: 'Regents style', topic: 'Special parallelograms',
+    q: 'In rectangle RECT, diagonal RC = 3x + 2 and diagonal ET = 5x − 10. What is RC?',
+    c: ['6', '10', '20', '40'], a: 2,
+    ex: 'Diagonals of a rectangle are congruent, so 3x + 2 = 5x − 10. That gives x = 6, and RC = 3(6) + 2 = 20.' },
+  { set: 'para', src: 'Regents style', topic: 'Special parallelograms',
+    q: 'The diagonals of rhombus ABCD meet at E. If m∠ABE = 35°, what is m∠BAE?',
+    c: ['35°', '55°', '70°', '90°'], a: 1,
+    ex: 'Diagonals of a rhombus are perpendicular, so m∠AEB = 90°. The angles in △ABE add to 180°: 180 − 90 − 35 = 55°.' },
+  { set: 'para', src: 'Activity 3', topic: 'Proof reasons', fig: 'wxyz',
+    q: `In parallelogram WXYZ, diagonals ${s('WY')} and ${s('XZ')} meet at P. Which reason proves ∠WXZ ≅ ∠YZX?`,
+    c: ['Vertical angles are congruent.', 'Parallel lines cut by a transversal form congruent alternate interior angles.', 'Opposite angles of a parallelogram are congruent.', 'Reflexive property'], a: 1,
+    ex: `${s('WX')} ∥ ${s('ZY')} and ${s('XZ')} is a transversal. ∠WXZ and ∠YZX are on opposite sides of the transversal, between the parallel lines, so they are alternate interior angles.` },
+  { set: 'para', src: 'Activity 3', topic: 'Proof reasons', fig: 'wxyz',
+    q: 'After proving △WPX ≅ △YPZ, which statement follows from CPCTC and shows the diagonals bisect each other?',
+    c: [`${s('WP')} ≅ ${s('YP')} and ${s('XP')} ≅ ${s('ZP')}`, `${s('WX')} ≅ ${s('YZ')}`, '∠WPX ≅ ∠YPZ', `${s('WY')} ≅ ${s('XZ')}`], a: 0,
+    ex: 'CPCTC means corresponding parts of congruent triangles are congruent. WP ≅ YP and XP ≅ ZP mean P cuts each diagonal into 2 equal pieces, which is what "bisect" means.' },
+  { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Special parallelograms',
+    q: 'Which property is true for every square but NOT for every rhombus?',
+    c: ['The diagonals are perpendicular.', 'The diagonals bisect each other.', 'The diagonals are congruent.', 'All four sides are congruent.'], a: 2,
+    ex: 'Rhombuses and squares both have 4 equal sides and perpendicular diagonals. Only the square (because it is also a rectangle) has congruent diagonals.' },
+
+  // More Regents-style practice
+  { set: 'regents', src: 'Regents style', topic: 'Midsegments',
+    q: `In △ABC, D is the midpoint of ${s('CA')} and E is the midpoint of ${s('CB')}. If DE = 2x + 3 and AB = 6x − 4, what is AB?`,
+    c: ['5', '13', '26', '52'], a: 2,
+    ex: 'The midsegment is half the third side, so AB = 2·DE. 6x − 4 = 2(2x + 3) = 4x + 6, so 2x = 10 and x = 5. AB = 6(5) − 4 = 26.' },
+  { set: 'regents', src: 'Regents style', topic: 'Trigonometry',
+    q: 'A 20-foot ladder leans against a wall and makes a 70° angle with the ground. How high up the wall does the ladder reach, to the nearest tenth of a foot?',
+    c: ['6.8', '7.3', '18.8', '21.3'], a: 2,
+    ex: 'The ladder is the hypotenuse and the height is opposite the 70° angle. SOH: sin 70° = h ÷ 20, so h = 20 · sin 70° ≈ 18.8 ft. Choice (1) uses cos by mistake.' },
+  { set: 'regents', src: 'Regents style', topic: 'Volume',
+    q: 'A cylinder has a radius of 3 inches and a height of 10 inches. What is its volume, to the nearest tenth of a cubic inch?',
+    c: ['94.2', '188.5', '282.7', '942.5'], a: 2,
+    ex: 'V = πr²h = π · 3² · 10 = 90π ≈ 282.7. Choice (2) is 60π, the side area, not the volume.' },
+  { set: 'regents', src: 'Regents style', topic: 'Transformations',
+    q: 'A triangle with an area of 5 square units is dilated by a scale factor of 3. What is the area of the image?',
+    c: ['15', '25', '45', '135'], a: 2,
+    ex: 'Lengths get multiplied by 3, but area gets multiplied by 3² = 9. 5 · 9 = 45.' },
+  { set: 'regents', src: 'Regents style', topic: 'Transformations',
+    q: 'Which transformation does NOT always preserve distance?',
+    c: ['a reflection', 'a rotation', 'a translation', 'a dilation with a scale factor of 2'], a: 3,
+    ex: 'Reflections, rotations and translations are rigid motions. A dilation with scale factor 2 doubles every length.' },
+  { set: 'regents', src: 'Regents style', topic: 'Trigonometry',
+    q: 'In right triangle ABC, ∠C is the right angle and sin A = 0.6. What is cos B?',
+    c: ['0.4', '0.6', '0.8', '1.6'], a: 1,
+    ex: '∠A and ∠B are complementary (they add to 90°). The sine of an angle equals the cosine of its complement, so cos B = sin A = 0.6.' }
+];
+
+/* ---------- flashcards ---------- */
+const CARDS = [
+  ['Parallelogram', 'A quadrilateral with both pairs of opposite sides parallel.'],
+  ['Rectangle', 'A parallelogram with four right angles. Its diagonals are congruent.'],
+  ['Rhombus', 'A parallelogram with four congruent sides. Its diagonals are perpendicular and bisect its angles.'],
+  ['Square', 'A parallelogram that is both a rectangle and a rhombus: 4 right angles and 4 equal sides.'],
+  ['Diagonal', 'A line segment that connects two non-adjacent vertices of a polygon.'],
+  ['Bisect', 'To cut into 2 equal pieces.'],
+  ['Midpoint', 'The point that divides a segment into two congruent segments.'],
+  ['CPCTC', 'Corresponding Parts of Congruent Triangles are Congruent. Use it after you prove two triangles congruent.'],
+  ['Alternate interior angles', 'When parallel lines are cut by a transversal, the angles on opposite sides of the transversal and between the lines are congruent.'],
+  ['Opposite angles of a parallelogram', 'They are congruent.'],
+  ['Consecutive angles of a parallelogram', 'They are supplementary: they add up to 180°.'],
+  ['Diagonals of a parallelogram', 'They bisect each other.'],
+  ['Triangle congruence shortcuts', 'SSS, SAS, ASA, AAS, and HL for right triangles. (No SSA or AAA!)'],
+  ['Reflexive property', 'Anything is congruent to itself, like AC ≅ CA. Use it for a shared side.'],
+  ['Midsegment of a triangle', 'Connects midpoints of two sides. It is parallel to the third side and half as long.'],
+  ['SOH CAH TOA', 'sin = opposite/hypotenuse, cos = adjacent/hypotenuse, tan = opposite/adjacent.'],
+  ['Rigid motion', 'A reflection, rotation or translation. It keeps lengths, angles and area the same.'],
+  ['Dilation', 'Stretches or shrinks a figure by scale factor k. Lengths ×k, area ×k². Angles stay the same.']
+];
+
+/* ---------- speed round ---------- */
+const TF = [
+  ['Every square is a rhombus.', true], ['Every rhombus is a square.', false],
+  ['Every rectangle is a parallelogram.', true], ['The diagonals of every parallelogram are congruent.', false],
+  ['The diagonals of a rhombus are perpendicular.', true], ['Consecutive angles of a parallelogram are congruent.', false],
+  ['Opposite angles of a parallelogram are congruent.', true], ['The diagonals of a parallelogram bisect each other.', true],
+  ['The diagonals of a rectangle bisect each other.', true], ['The diagonals of a rectangle always bisect its angles.', false],
+  ['The diagonals of a rhombus bisect its angles.', true], ['All four sides of every rectangle are congruent.', false],
+  ['Opposite sides of a parallelogram are parallel.', true], ['A reflection changes the area of a figure.', false],
+  ['A dilation with scale factor 3 triples the area.', false], ['A translation preserves distance.', true],
+  ['A midsegment of a triangle is half as long as the third side.', true], ['A midsegment is perpendicular to the third side.', false],
+  ['sin = opposite ÷ hypotenuse', true], ['cos = opposite ÷ adjacent', false],
+  ['A 180° rotation about the diagonals\' intersection maps a parallelogram onto itself.', true],
+  ['A 90° rotation about its center maps any rectangle onto itself.', false],
+  ['A square has 4 lines of symmetry.', true], ['The angles of a quadrilateral add up to 360°.', true],
+  ['Every parallelogram is a rectangle.', false], ['Consecutive angles of a parallelogram add to 180°.', true],
+  ['SSA proves two triangles are congruent.', false], ['If a quadrilateral\'s diagonals bisect each other, it is a parallelogram.', true]
+];
+
+/* ---------- proofs ---------- */
+const R = {
+  given: 'Given',
+  defPara: 'Definition of a parallelogram (opposite sides are parallel)',
+  altInt: 'Parallel lines cut by a transversal form congruent alternate interior angles',
+  oppSides: 'Opposite sides of a parallelogram are congruent',
+  asa: 'ASA',
+  cpctc: 'CPCTC',
+  defBisect: 'Definition of bisect (P is the midpoint of both diagonals)',
+  reflex: 'Reflexive property',
+  vert: 'Vertical angles are congruent',
+  sss: 'SSS',
+  sas: 'SAS',
+  corr: 'Parallel lines cut by a transversal form congruent corresponding angles',
+  oppAng: 'Opposite angles of a parallelogram are congruent',
+  defMid: 'Definition of midpoint'
+};
+const PROOFS = [
+  { title: 'Diagonals bisect each other', from: 'Activity 3, question 11', fig: 'wxyz',
+    given: 'WXYZ is a parallelogram with diagonals ' + s('WY') + ' and ' + s('XZ') + ' meeting at P.',
+    prove: s('WY') + ' and ' + s('XZ') + ' bisect each other.',
+    steps: [
+      ['WXYZ is a parallelogram', 'given'],
+      [s('WX') + ' ∥ ' + s('ZY'), 'defPara'],
+      ['∠XWY ≅ ∠ZYW and ∠WXZ ≅ ∠YZX', 'altInt'],
+      [s('WX') + ' ≅ ' + s('YZ'), 'oppSides'],
+      ['△WPX ≅ △YPZ', 'asa'],
+      [s('WP') + ' ≅ ' + s('YP') + ' and ' + s('XP') + ' ≅ ' + s('ZP'), 'cpctc'],
+      [s('WY') + ' and ' + s('XZ') + ' bisect each other', 'defBisect']
+    ] },
+  { title: 'Opposite sides are congruent', from: 'Synthesis: use a diagonal', fig: 'abcd',
+    given: 'ABCD is a parallelogram with diagonal ' + s('AC') + '.',
+    prove: s('AB') + ' ≅ ' + s('CD') + ' and ' + s('BC') + ' ≅ ' + s('DA') + '.',
+    steps: [
+      ['ABCD is a parallelogram', 'given'],
+      [s('AB') + ' ∥ ' + s('CD') + ' and ' + s('BC') + ' ∥ ' + s('DA'), 'defPara'],
+      ['∠BAC ≅ ∠DCA and ∠BCA ≅ ∠DAC', 'altInt'],
+      [s('AC') + ' ≅ ' + s('CA'), 'reflex'],
+      ['△ABC ≅ △CDA', 'asa'],
+      [s('AB') + ' ≅ ' + s('CD') + ' and ' + s('BC') + ' ≅ ' + s('DA'), 'cpctc']
+    ] }
+];
+
+/* ---------- cheat sheet table ---------- */
+const PROPS = [
+  ['Opposite sides parallel', 1, 1, 1, 1], ['Opposite sides congruent', 1, 1, 1, 1],
+  ['Opposite angles congruent', 1, 1, 1, 1], ['Consecutive angles add to 180°', 1, 1, 1, 1],
+  ['Diagonals bisect each other', 1, 1, 1, 1], ['Four right angles', 0, 1, 0, 1],
+  ['Diagonals congruent', 0, 1, 0, 1], ['Four congruent sides', 0, 0, 1, 1],
+  ['Diagonals perpendicular', 0, 0, 1, 1], ['Diagonals bisect the angles', 0, 0, 1, 1]
+];
+
+/* ---------- helpers & saved progress ---------- */
+const $ = id => document.getElementById(id);
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let store = { xp: 0, best: 0, speedBest: 0 };
+try { const v = JSON.parse(localStorage.getItem('geometry-study') || 'null'); if (v) store = Object.assign(store, v); } catch (e) {}
+const save = () => { try { localStorage.setItem('geometry-study', JSON.stringify(store)); } catch (e) {} };
+const RANKS = ['Point', 'Segment', 'Ray', 'Angle', 'Triangle', 'Rhombus', 'Parallelogram Pro', 'Proof Master', 'Regents Ready'];
+let streak = 0;
+
+function renderStats() {
+  const lvl = Math.min(Math.floor(store.xp / 150), RANKS.length - 1);
+  $('rank').textContent = RANKS[lvl];
+  $('xpbar').style.width = lvl === RANKS.length - 1 ? '100%' : ((store.xp % 150) / 150 * 100) + '%';
+  $('xp').textContent = store.xp;
+  $('best').textContent = store.best;
+  $('cardMeta').textContent = CARDS.length + ' cards';
+  $('speedMeta').textContent = store.speedBest ? '60 seconds · best ' + store.speedBest : '60 seconds';
+}
+function addXP(n) { store.xp += n; save(); renderStats(); }
+function hit() { streak++; if (streak > store.best) { store.best = streak; save(); } }
+function miss() { streak = 0; }
+
+const VIEWS = ['home', 'quiz', 'cards', 'speed', 'proof'];
+function show(v) { VIEWS.forEach(x => $(x).hidden = x !== v); window.scrollTo(0, 0); if (v === 'home') renderStats(); }
+document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => { stopSpeed(); show('home'); });
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+
+function go(mode) {
+  if (mode === 'para') startQuiz('Parallelogram Quiz', shuffle(Q.filter(q => q.set === 'para')).slice(0, 10));
+  if (mode === 'regents') startQuiz('Regents Practice', Q.filter(q => q.set === 'real').concat(shuffle(Q.filter(q => q.set === 'regents'))));
+  if (mode === 'mixed') startQuiz('Mixed Review', shuffle(Q.slice()).slice(0, 12));
+  if (mode === 'cards') startCards();
+  if (mode === 'speed') startSpeed();
+  if (mode === 'proof') startProofPick();
+}
+
+/* ---------- quiz ---------- */
+let S = null;
+function startQuiz(title, list) {
+  S = { title, list, i: 0, right: 0, missed: [], locked: false, mode: title };
+  $('qTitle').textContent = title;
+  $('qStage').hidden = false; $('qEnd').hidden = true;
+  show('quiz'); renderQ();
+}
+function renderQ() {
+  const q = S.list[S.i];
+  S.locked = false;
+  $('qProg').style.width = (S.i / S.list.length * 100) + '%';
+  $('qCount').textContent = `${S.i + 1} / ${S.list.length}`;
+  $('qTags').innerHTML = `<span class="chip">${q.topic}</span><span class="chip ${q.set === 'real' ? 'real' : 'src'}">${q.src}</span>`;
+  $('qText').innerHTML = q.q;
+  $('qFig').innerHTML = q.fig ? FIG[q.fig] : ''; $('qFig').hidden = !q.fig;
+  $('qChoices').innerHTML = q.c.map((c, k) => `<button class="choice" data-k="${k}"><span class="num">(${k + 1})</span><span>${c}</span></button>`).join('');
+  $('qChoices').querySelectorAll('.choice').forEach(b => b.onclick = () => pick(+b.dataset.k));
+  $('qFeedback').hidden = true; $('qNextRow').hidden = true;
+}
+function pick(k) {
+  if (!S || S.locked) return;
+  S.locked = true;
+  const q = S.list[S.i], ok = k === q.a;
+  const btns = $('qChoices').querySelectorAll('.choice');
+  btns.forEach((b, i) => { b.disabled = true; if (i === q.a) b.classList.add('right'); else if (i === k) b.classList.add('wrong'); });
+  if (ok) { S.right++; hit(); addXP(10 + Math.min(streak, 5) * 2); } else { miss(); S.missed.push(q); }
+  const fb = $('qFeedback');
+  fb.className = 'feedback ' + (ok ? 'ok' : 'no');
+  const cheers = ['Nice!', 'Correct!', 'You got it!', 'Nailed it!', 'Exactly right!'];
+  fb.innerHTML = `<strong>${ok ? cheers[Math.floor(Math.random() * cheers.length)] + (streak >= 3 ? ` ${streak} in a row!` : '') : `Not quite. The answer is (${q.a + 1}).`}</strong><p>${q.ex}</p>`;
+  fb.hidden = false;
+  $('qNext').textContent = S.i === S.list.length - 1 ? 'See results' : 'Next question';
+  $('qNextRow').hidden = false; $('qNext').focus();
+}
+$('qNext').onclick = () => { S.i++; if (S.i >= S.list.length) endQuiz(); else renderQ(); };
+function endQuiz() {
+  $('qProg').style.width = '100%';
+  const n = S.list.length, r = S.right, pct = r / n;
+  const msg = pct === 1 ? 'Perfect score. You are Regents ready!' : pct >= 0.8 ? 'Great job. Look over the few you missed.' : pct >= 0.6 ? 'Good start. Review the misses below and try again.' : 'Keep going. Read the explanations below, then run it again.';
+  const end = $('qEnd');
+  end.innerHTML = `<div class="chips"><span class="chip">${S.title}</span></div>
+    <div class="big mono">${r}/${n}</div><p>${msg}</p>
+    <div class="row"><button class="btn pop" id="again">Try again</button><button class="btn ghost" data-home2>All modes</button></div>
+    ${S.missed.length ? `<div class="missed"><div class="section-label" style="margin:8px 0 0">Review what you missed</div>${S.missed.map(q => `<div class="m"><div>${q.q}</div><div class="a">Answer: (${q.a + 1}) ${q.c[q.a]}</div><div>${q.ex}</div></div>`).join('')}</div>` : ''}`;
+  $('qStage').hidden = true; end.hidden = false;
+  $('again').onclick = () => go({ 'Parallelogram Quiz': 'para', 'Regents Practice': 'regents', 'Mixed Review': 'mixed' }[S.title]);
+  end.querySelector('[data-home2]').onclick = () => show('home');
+  if (pct >= 0.8) confetti();
+}
+
+/* ---------- flashcards ---------- */
+let F = null;
+function startCards() {
+  F = { deck: shuffle(CARDS.map((c, i) => i)), known: 0 };
+  $('fcPlay').hidden = false; $('fcEnd').hidden = true;
+  show('cards'); renderCard();
+}
+function renderCard() {
+  $('fcCard').classList.remove('on');
+  const c = CARDS[F.deck[0]];
+  $('fcTerm').textContent = c[0]; $('fcDef').textContent = c[1];
+  $('fcCount').textContent = `${F.known} / ${CARDS.length} known`;
+  $('fcProg').style.width = (F.known / CARDS.length * 100) + '%';
+}
+$('fcCard').onclick = () => $('fcCard').classList.toggle('on');
+$('fcKnow').onclick = () => {
+  F.deck.shift(); F.known++; addXP(3);
+  if (!F.deck.length) {
+    $('fcProg').style.width = '100%'; $('fcCount').textContent = `${CARDS.length} / ${CARDS.length} known`;
+    $('fcPlay').hidden = true;
+    $('fcEnd').innerHTML = `<div class="big">All ${CARDS.length}!</div><p>You sorted every card into "I know it".</p><div class="row"><button class="btn pop" id="fcRe">Go again</button><button class="btn ghost" id="fcHome">All modes</button></div>`;
+    $('fcEnd').hidden = false; $('fcRe').onclick = startCards; $('fcHome').onclick = () => show('home'); confetti();
+  } else renderCard();
+};
+$('fcAgain').onclick = () => { F.deck.push(F.deck.shift()); renderCard(); };
+
+/* ---------- speed round ---------- */
+let P = null, timerId = null;
+function startSpeed() {
+  stopSpeed();
+  P = { list: shuffle(TF.slice()), i: 0, score: 0, wrong: [], t: 60 };
+  $('spPlay').hidden = false; $('spEnd').hidden = true;
+  show('speed'); renderTF(); tick();
+  timerId = setInterval(() => { P.t--; tick(); if (P.t <= 0) endSpeed(); }, 1000);
+}
+function stopSpeed() { if (timerId) { clearInterval(timerId); timerId = null; } }
+function tick() {
+  $('spTimer').textContent = P.t; $('spTimer').classList.toggle('low', P.t <= 10);
+  $('spProg').style.width = ((60 - P.t) / 60 * 100) + '%';
+}
+function renderTF() { $('spText').textContent = P.list[P.i][0]; $('spScore').textContent = 'Score ' + P.score; }
+function answerTF(v) {
+  if (!timerId) return;
+  const it = P.list[P.i], ok = v === it[1], el = $('spText');
+  if (ok) { P.score++; hit(); } else { P.wrong.push(it); miss(); }
+  el.classList.remove('flash-ok', 'flash-no'); void el.offsetWidth; el.classList.add(ok ? 'flash-ok' : 'flash-no');
+  P.i++; if (P.i >= P.list.length) { P.list = P.list.concat(shuffle(TF.slice())); }
+  renderTF();
+}
+$('spT').onclick = () => answerTF(true); $('spF').onclick = () => answerTF(false);
+function endSpeed() {
+  stopSpeed();
+  const newBest = P.score > store.speedBest;
+  if (newBest) store.speedBest = P.score;
+  addXP(P.score * 5);
+  $('spPlay').hidden = true;
+  $('spEnd').innerHTML = `<div class="chips"><span class="chip">${newBest ? 'New best!' : 'Best: ' + store.speedBest}</span></div>
+    <div class="big mono">${P.score}</div><p>correct in 60 seconds</p>
+    <div class="row"><button class="btn pop" id="spRe">Play again</button><button class="btn ghost" id="spHome">All modes</button></div>
+    ${P.wrong.length ? `<div class="missed"><div class="section-label" style="margin:8px 0 0">Fix these</div>${P.wrong.map(w => `<div class="m">${w[0]}<div class="a">That's ${w[1] ? 'TRUE' : 'FALSE'}</div></div>`).join('')}</div>` : ''}`;
+  $('spEnd').hidden = false;
+  $('spRe').onclick = startSpeed; $('spHome').onclick = () => show('home');
+  if (newBest && P.score > 5) confetti();
+}
+
+/* ---------- proof builder ---------- */
+let PF = null;
+function startProofPick() {
+  $('pfTitle').textContent = 'Proof Builder'; $('pfCount').textContent = '';
+  $('pfPlay').hidden = true; $('pfPick').hidden = false;
+  $('pfPick').innerHTML = `<p style="margin-bottom:14px">Each statement is filled in for you. Your job is to pick the reason that proves it. Wrong picks cost nothing, just try again.</p>
+    <div class="proofpick">${PROOFS.map((p, i) => `<button class="mode" data-p="${i}"><h3>${p.title}</h3><p>${p.from}</p><span class="meta">${p.steps.length} steps</span></button>`).join('')}</div>`;
+  $('pfPick').querySelectorAll('[data-p]').forEach(b => b.onclick = () => startProof(+b.dataset.p));
+  show('proof');
+}
+function startProof(i) {
+  const p = PROOFS[i];
+  PF = { p, idx: i, step: 0, mistakes: 0 };
+  $('pfTitle').textContent = p.title;
+  $('pfGiven').innerHTML = p.given; $('pfProve').innerHTML = p.prove; $('pfFig').innerHTML = FIG[p.fig];
+  $('pfPick').hidden = true; $('pfPlay').hidden = false;
+  renderProof();
+}
+function renderProof() {
+  const p = PF.p;
+  $('pfCount').textContent = `Step ${Math.min(PF.step + 1, p.steps.length)} of ${p.steps.length}`;
+  $('pfRows').innerHTML = p.steps.map((st, k) => k > PF.step ? '' :
+    `<tr class="${k === PF.step ? 'cur' : ''}"><td>${k + 1}</td><td>${st[0]}</td><td>${k < PF.step ? R[st[1]] : '?'}</td></tr>`).join('');
+  if (PF.step >= p.steps.length) {
+    $('pfAsk').innerHTML = `<div class="feedback ok"><strong>Proof complete!</strong><p>${PF.mistakes === 0 ? 'No wrong picks. That is a clean proof.' : `You finished with ${PF.mistakes} wrong pick${PF.mistakes > 1 ? 's' : ''}. Run it again to get it clean.`}</p></div>
+      <div class="row"><button class="btn pop" id="pfRe">Do it again</button><button class="btn" id="pfOther">Next proof</button><button class="btn ghost" id="pfBack">Pick a proof</button></div>`;
+    $('pfRe').onclick = () => startProof(PF.idx);
+    $('pfOther').onclick = () => startProof((PF.idx + 1) % PROOFS.length);
+    $('pfBack').onclick = startProofPick;
+    if (PF.mistakes === 0) confetti();
+    return;
+  }
+  const right = p.steps[PF.step][1];
+  const others = shuffle(Object.keys(R).filter(k => k !== right)).slice(0, 3);
+  const opts = shuffle([right].concat(others));
+  $('pfAsk').innerHTML = `<p style="margin-top:16px;font-weight:700">Why is step ${PF.step + 1} true?</p><div class="reasons">${opts.map(o => `<button class="choice" data-r="${o}"><span>${R[o]}</span></button>`).join('')}</div>`;
+  $('pfAsk').querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
+    if (b.dataset.r === right) {
+      b.classList.add('right'); hit(); addXP(5);
+      setTimeout(() => { PF.step++; renderProof(); }, 450);
+    } else {
+      b.classList.add('wrong'); b.disabled = true; PF.mistakes++; miss();
+    }
+  });
+}
+
+/* ---------- keyboard ---------- */
+document.addEventListener('keydown', e => {
+  if (!$('quiz').hidden && !$('qStage').hidden) {
+    if (/^[1-4]$/.test(e.key)) pick(+e.key - 1);
+    else if (e.key === 'Enter' && S && S.locked && document.activeElement !== $('qNext')) $('qNext').click();
+  } else if (!$('cards').hidden && !$('fcPlay').hidden) {
+    if (e.key === ' ') { e.preventDefault(); $('fcCard').classList.toggle('on'); }
+    else if (e.key === 'ArrowRight') $('fcKnow').click();
+    else if (e.key === 'ArrowLeft') $('fcAgain').click();
+  } else if (!$('speed').hidden && timerId) {
+    const k = e.key.toLowerCase();
+    if (k === 't' || e.key === 'ArrowLeft') answerTF(true);
+    if (k === 'f' || e.key === 'ArrowRight') answerTF(false);
+  }
+});
+
+/* ---------- confetti ---------- */
+function confetti() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('confetti'), ctx = cv.getContext('2d');
+  cv.width = innerWidth; cv.height = innerHeight;
+  const cs = getComputedStyle(document.documentElement);
+  const cols = ['--accent', '--pop', '--good', '--bad'].map(v => cs.getPropertyValue(v).trim());
+  const parts = Array.from({ length: 140 }, () => ({
+    x: Math.random() * cv.width, y: -20 - Math.random() * cv.height * 0.5,
+    vx: (Math.random() - 0.5) * 3, vy: 2 + Math.random() * 4, r: Math.random() * Math.PI,
+    vr: (Math.random() - 0.5) * 0.3, s: 6 + Math.random() * 6, c: cols[Math.floor(Math.random() * cols.length)],
+    shape: Math.floor(Math.random() * 3)
+  }));
+  let frames = 0;
+  (function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    parts.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.r += p.vr;
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.beginPath();
+      if (p.shape === 0) { ctx.moveTo(0, -p.s / 2); ctx.lineTo(p.s / 2, p.s / 2); ctx.lineTo(-p.s / 2, p.s / 2); }
+      else if (p.shape === 1) { ctx.moveTo(-p.s / 2, p.s / 3); ctx.lineTo(-p.s / 4, -p.s / 3); ctx.lineTo(p.s / 2, -p.s / 3); ctx.lineTo(p.s / 4, p.s / 3); }
+      else ctx.rect(-p.s / 2, -p.s / 2, p.s, p.s);
+      ctx.fill(); ctx.restore();
+    });
+    if (++frames < 200) requestAnimationFrame(draw); else ctx.clearRect(0, 0, cv.width, cv.height);
+  })();
+}
+
+/* ---------- start ---------- */
+$('propTable').innerHTML = PROPS.map(r => `<tr><td>${r[0]}</td>${r.slice(1).map(v => v ? '<td class="y">✓</td>' : '<td class="n">–</td>').join('')}</tr>`).join('');
+renderStats();
+</script>
+</body>
+</html>
