@@ -30,6 +30,7 @@
   --tile-c: #dcf3e8;
   --tile-d: #fbe2e7;
   --water: rgba(42, 86, 198, 0.16);
+  --gridline: #d3dbe8;
   --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
   --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -40,7 +41,7 @@
     --line: #2b3650; --accent: #86a8ff; --accent-soft: #1f2c4d; --pop: #ffd75e; --on-pop: #231d05;
     --good: #4fd39b; --good-soft: #143a2c; --bad: #ff7d92; --bad-soft: #43202a;
     --tile-a: #1f2c4d; --tile-b: #3a3214; --tile-c: #143a2c; --tile-d: #43202a;
-    --water: rgba(134, 168, 255, 0.18); color-scheme: dark;
+    --water: rgba(134, 168, 255, 0.18); --gridline: #2e3a55; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
@@ -48,7 +49,7 @@
   --line: #2b3650; --accent: #86a8ff; --accent-soft: #1f2c4d; --pop: #ffd75e; --on-pop: #231d05;
   --good: #4fd39b; --good-soft: #143a2c; --bad: #ff7d92; --bad-soft: #43202a;
   --tile-a: #1f2c4d; --tile-b: #3a3214; --tile-c: #143a2c; --tile-d: #43202a;
-  --water: rgba(134, 168, 255, 0.18); color-scheme: dark;
+  --water: rgba(134, 168, 255, 0.18); --gridline: #2e3a55; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -66,7 +67,7 @@ body {
   margin: 0;
 }
 main {
-  max-width: 980px;
+  max-width: 1080px;
   margin: 0 auto;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
@@ -97,7 +98,7 @@ button:focus-visible, .choice:focus-visible { outline: 3px solid var(--accent); 
 
 /* ---------- mode grid ---------- */
 .section-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; margin: 34px 0 12px; }
-.modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.modes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 .mode {
   text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: 16px;
   padding: 18px; display: flex; flex-direction: column; gap: 10px;
@@ -154,6 +155,33 @@ td.n { color: var(--muted); }
 .fig .pt { fill: var(--fg); stroke: none; }
 .fig text { fill: var(--fg); font-family: var(--mono); font-size: 14px; font-weight: 700; }
 .fig text.lbl { fill: var(--muted); font-weight: 500; font-size: 13px; }
+.fig text.sm { font-size: 12px; }
+.fig .g { stroke: var(--gridline); stroke-width: 1; fill: none; }
+.fig .ax { stroke: var(--fg); stroke-width: 1.5; fill: none; }
+.fig .arc { stroke: var(--accent); fill: none; stroke-width: 1.8; }
+
+/* written response */
+.ansrow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+.ansrow label { font-weight: 700; }
+.ansrow input {
+  font: inherit; font-family: var(--mono); padding: 10px 12px; border-radius: 10px; width: 11em; max-width: 100%;
+  border: 1.5px solid var(--line); background: var(--paper); color: var(--fg);
+}
+.ansrow input:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.ansrow .unit { color: var(--muted); }
+.verdict { font-weight: 700; }
+.verdict.ok { color: var(--good); } .verdict.no { color: var(--bad); }
+.solution { margin-top: 16px; background: var(--paper); border: 1.5px dashed var(--line); border-radius: 12px; padding: 14px 16px; }
+.solution h4 { font-family: var(--display); margin: 0 0 8px; font-size: 1rem; }
+.solution ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.solution .final { margin-top: 10px; font-weight: 700; }
+.jump { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.jump button {
+  min-width: 40px; padding: 6px 8px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card);
+  font-family: var(--mono); font-size: 0.85rem; font-weight: 700;
+}
+.jump button.cur { border-color: var(--accent); color: var(--accent); }
+.jump button.done { background: var(--good-soft); border-color: var(--good); color: var(--good); }
 .choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
 .choice {
   display: flex; gap: 10px; align-items: flex-start; text-align: left; padding: 12px 14px;
@@ -239,8 +267,10 @@ td.n { color: var(--muted); }
 }
 #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
   .sheet, .gp { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 520px) {
@@ -260,7 +290,7 @@ td.n { color: var(--muted); }
   <header class="top">
     <div class="brand">
       <h1><span class="hl">Geometry</span> Study</h1>
-      <p>Unit 2 parallelograms and the June 23, 2026 Regents. Pick a mode and start earning points.</p>
+      <p>Amplify Unit 2 parallelograms and the full June 23, 2026 Regents. Pick a mode and start earning points.</p>
     </div>
     <div class="stats" aria-live="polite">
       <div class="stat level"><div class="k">Rank</div><div class="v" id="rank">Point</div><div class="xpbar"><i id="xpbar"></i></div></div>
@@ -274,25 +304,37 @@ td.n { color: var(--muted); }
     <button class="mode" data-go="para">
       <span class="ico ta"><svg viewBox="0 0 32 32"><path d="M4 26 L11 6 H28 L21 26 Z"/><path d="M4 26 L28 6" stroke-dasharray="3 3"/></svg></span>
       <h3>Parallelogram Quiz</h3>
-      <p>Angles, diagonals, coordinates and proof reasons from Unit 2 Lesson 14.</p>
-      <span class="meta">10 questions</span>
+      <p>Amplify Unit 2: Go With the Flow and A-Door-Able Parallelograms.</p>
+      <span class="meta" id="m-para">10 questions</span>
     </button>
-    <button class="mode" data-go="regents">
+    <button class="mode" data-go="cong">
+      <span class="ico tc"><svg viewBox="0 0 32 32"><path d="M3 26 L10 8 L15 26 Z"/><path d="M17 26 L24 8 L29 26 Z"/><path d="M6 17 L8 17 M20 17 L22 17"/></svg></span>
+      <h3>Congruence &amp; Moves</h3>
+      <p>Your Amplify practice: SSS, ASA, SAS, congruence statements, rotations and reflections.</p>
+      <span class="meta" id="m-cong">10 questions</span>
+    </button>
+    <button class="mode" data-go="exam">
       <span class="ico tb"><svg viewBox="0 0 32 32"><path d="M8 3 H20 L26 9 V29 H8 Z"/><path d="M20 3 V9 H26"/><path d="M12 15 H22 M12 20 H22 M12 25 H18"/></svg></span>
-      <h3>Regents Practice</h3>
-      <p>The 4 questions from your June 23, 2026 exam, plus 6 more in the same style.</p>
-      <span class="meta">10 questions</span>
+      <h3>Regents Part I</h3>
+      <p>All 24 multiple-choice questions from the June 23, 2026 exam, in order.</p>
+      <span class="meta">24 questions · 48 credits</span>
+    </button>
+    <button class="mode" data-go="work">
+      <span class="ico td"><svg viewBox="0 0 32 32"><path d="M6 26 L22 10 L26 14 L10 30 H6 Z"/><path d="M19 13 L23 17"/><path d="M4 6 H16 M4 11 H12"/></svg></span>
+      <h3>Regents Parts II–IV</h3>
+      <p>Questions 25–35. Type your answer, check it, then see the full worked solution.</p>
+      <span class="meta" id="m-work">11 problems</span>
     </button>
     <button class="mode" data-go="proof">
       <span class="ico tc"><svg viewBox="0 0 32 32"><path d="M5 8 L9 12 L15 5"/><path d="M5 18 L9 22 L15 15"/><path d="M19 9 H28 M19 19 H28 M5 28 H28"/></svg></span>
       <h3>Proof Builder</h3>
-      <p>Pick the reason for each step, like the diagonals proof from Activity 3.</p>
-      <span class="meta">2 proofs</span>
+      <p>Pick the reason for every step. Includes Activity 3, Go With the Flow and Regents #34.</p>
+      <span class="meta" id="m-proof">proofs</span>
     </button>
     <button class="mode" data-go="cards">
-      <span class="ico td"><svg viewBox="0 0 32 32"><rect x="8" y="9" width="20" height="16" rx="2"/><path d="M4 21 V7 A2 2 0 0 1 6 5 H22"/></svg></span>
+      <span class="ico ta"><svg viewBox="0 0 32 32"><rect x="8" y="9" width="20" height="16" rx="2"/><path d="M4 21 V7 A2 2 0 0 1 6 5 H22"/></svg></span>
       <h3>Flashcards</h3>
-      <p>Vocab and theorems. Flip each card, then sort it: know it or still learning.</p>
+      <p>Vocab, theorems and formulas. Flip each card, then sort it.</p>
       <span class="meta" id="cardMeta">cards</span>
     </button>
     <button class="mode" data-go="speed">
@@ -302,10 +344,10 @@ td.n { color: var(--muted); }
       <span class="meta" id="speedMeta">60 seconds</span>
     </button>
     <button class="mode" data-go="mixed">
-      <span class="ico ta"><svg viewBox="0 0 32 32"><path d="M4 27 L11 14 L18 27 Z"/><circle cx="23" cy="9" r="5"/><rect x="4" y="4" width="9" height="7"/><rect x="19" y="19" width="9" height="8"/></svg></span>
+      <span class="ico td"><svg viewBox="0 0 32 32"><path d="M4 27 L11 14 L18 27 Z"/><circle cx="23" cy="9" r="5"/><rect x="4" y="4" width="9" height="7"/><rect x="19" y="19" width="9" height="8"/></svg></span>
       <h3>Mixed Review</h3>
-      <p>12 random questions pulled from every mode. Good for a last check.</p>
-      <span class="meta">12 questions</span>
+      <p>15 random multiple-choice questions from every mode.</p>
+      <span class="meta">15 questions</span>
     </button>
   </div>
 
@@ -332,6 +374,11 @@ td.n { color: var(--muted); }
         <div><b>Slope</b><span>(y₂−y₁)/(x₂−x₁)</span></div>
         <div><b>Distance</b><span>√((Δx)² + (Δy)²)</span></div>
         <div><b>Dilation by k</b><span>lengths ×k, area ×k²</span></div>
+        <div><b>Cone / pyramid</b><span>V = ⅓Bh</span></div>
+        <div><b>Arc length</b><span>(angle/360) · 2πr</span></div>
+        <div><b>Triangle area</b><span>½ab · sin C</span></div>
+        <div><b>Tangent–secant</b><span>tan² = outside · whole</span></div>
+        <div><b>Circle</b><span>(x−h)² + (y−k)² = r²</span></div>
       </div>
       <h3 style="margin-top:16px">Ways to prove it's a parallelogram</h3>
       <ul class="ways">
@@ -397,6 +444,33 @@ td.n { color: var(--muted); }
   <div class="stage end" id="spEnd" hidden></div>
 </section>
 
+<!-- ================= WRITTEN RESPONSE ================= -->
+<section id="work" hidden>
+  <button class="back" data-home>← All modes</button>
+  <div class="playhead"><h2>Regents Parts II–IV</h2><span class="count" id="wkCount"></span></div>
+  <div class="jump" id="wkJump"></div>
+  <div class="stage">
+    <div class="chips" id="wkTags"></div>
+    <p class="qtext" id="wkText"></p>
+    <div class="fig" id="wkFig" hidden></div>
+    <div class="ansrow" id="wkAnsRow">
+      <label for="wkInput">Your answer</label>
+      <input id="wkInput" autocomplete="off" inputmode="decimal">
+      <span class="unit" id="wkUnit"></span>
+      <button class="btn" id="wkCheck">Check</button>
+      <span class="verdict" id="wkVerdict" aria-live="polite"></span>
+    </div>
+    <div class="row">
+      <button class="btn pop" id="wkShow">Show solution</button>
+    </div>
+    <div class="solution" id="wkSol" hidden></div>
+    <div class="row">
+      <button class="btn ghost" id="wkPrev">← Previous</button>
+      <button class="btn" id="wkNext">Next problem →</button>
+    </div>
+  </div>
+</section>
+
 <!-- ================= PROOF ================= -->
 <section id="proof" hidden>
   <button class="back" data-home>← All modes</button>
@@ -420,72 +494,222 @@ td.n { color: var(--muted); }
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <script>
-/* ---------- figures ---------- */
+/* ---------- figure helpers ---------- */
+const svg = (w, h, label, body) => `<svg viewBox="0 0 ${w} ${h}" width="${w}" role="img" aria-label="${label}">${body}</svg>`;
+const tx = (x, y, t, cls) => `<text x="${x}" y="${y}"${cls ? ` class="${cls}"` : ''}>${t}</text>`;
+const dot = (x, y) => `<circle class="pt" cx="${x}" cy="${y}" r="3.5"/>`;
+const rightMark = (x, y, dx, dy) => `<path class="s" d="M${x + dx} ${y} V${y + dy} H${x}"/>`;
+function arc(cx, cy, r, a1, a2) {
+  const p = a => [(cx + r * Math.cos(a * Math.PI / 180)).toFixed(1), (cy - r * Math.sin(a * Math.PI / 180)).toFixed(1)];
+  const [x1, y1] = p(a1), [x2, y2] = p(a2);
+  return `<path class="arc" d="M${x1} ${y1} A${r} ${r} 0 ${a2 - a1 > 180 ? 1 : 0} 0 ${x2} ${y2}"/>`;
+}
+function grid(label, pts, polys) {
+  const u = 15, mn = -10, mx = 10, o = 16, X = x => o + (x - mn) * u, Y = y => o + (mx - y) * u, W = 2 * o + (mx - mn) * u;
+  let g = '';
+  for (let i = mn; i <= mx; i++) g += `<line class="g" x1="${X(i)}" y1="${Y(mn)}" x2="${X(i)}" y2="${Y(mx)}"/><line class="g" x1="${X(mn)}" y1="${Y(i)}" x2="${X(mx)}" y2="${Y(i)}"/>`;
+  g += `<line class="ax" x1="${X(mn)}" y1="${Y(0)}" x2="${X(mx)}" y2="${Y(0)}"/><line class="ax" x1="${X(0)}" y1="${Y(mn)}" x2="${X(0)}" y2="${Y(mx)}"/>`;
+  g += tx(X(mx) - 9, Y(0) - 5, 'x', 'lbl') + tx(X(0) - 13, Y(mx) + 11, 'y', 'lbl');
+  polys.forEach(pl => g += `<polygon class="s" points="${pl.map(n => X(pts[n][0]) + ',' + Y(pts[n][1])).join(' ')}"/>`);
+  Object.entries(pts).forEach(([n, [x, y, dx, dy]]) => g += dot(X(x), Y(y)) + tx(X(x) + dx, Y(y) + dy, n, 'sm'));
+  return svg(W, W, label, g);
+}
+
 const FIG = {
-  midseg: `<svg viewBox="0 0 320 262" width="320" role="img" aria-label="Triangle ABC with midpoints D on CA and E on CB">
-    <polygon class="s" points="40,25 95,205 295,240"/>
-    <line class="s" x1="67.5" y1="115" x2="167.5" y2="132.5"/>
-    <circle class="pt" cx="67.5" cy="115" r="3.5"/><circle class="pt" cx="167.5" cy="132.5" r="3.5"/>
-    <text x="26" y="22">C</text><text x="84" y="228">A</text><text x="290" y="258">B</text>
-    <text x="48" y="120">D</text><text x="168" y="154">E</text></svg>`,
-  trig: `<svg viewBox="0 0 300 180" width="300" role="img" aria-label="Right triangle RJM, right angle at R, MR is 7.25 inches">
-    <polygon class="s" points="30,140 250,140 250,30"/>
-    <path class="s" d="M236 140 V126 H250"/>
-    <text x="12" y="146">M</text><text x="258" y="150">R</text><text x="256" y="28">J</text>
-    <text class="lbl" x="110" y="162">7.25 in</text><text class="lbl" x="66" y="134">35°</text></svg>`,
-  tank: `<svg viewBox="0 0 320 200" width="320" role="img" aria-label="Fish tank 35 by 17 by 25 centimeters, water 3 cm below the top">
-    <rect class="w" x="20" y="64" width="200" height="106"/>
+  midseg: svg(320, 262, 'Triangle ABC with midpoints D on CA and E on CB',
+    `<polygon class="s" points="40,25 95,205 295,240"/><line class="s" x1="67.5" y1="115" x2="167.5" y2="132.5"/>${dot(67.5, 115)}${dot(167.5, 132.5)}
+    ${tx(26, 22, 'C')}${tx(84, 228, 'A')}${tx(290, 258, 'B')}${tx(48, 120, 'D')}${tx(168, 154, 'E')}`),
+  trig: svg(300, 180, 'Right triangle RJM, right angle at R, MR is 7.25 inches',
+    `<polygon class="s" points="30,140 250,140 250,30"/>${rightMark(250, 140, -14, -14)}
+    ${tx(12, 146, 'M')}${tx(258, 150, 'R')}${tx(256, 28, 'J')}${tx(110, 162, '7.25 in', 'lbl')}`),
+  tank: svg(320, 200, 'Fish tank 35 by 17 by 25 centimeters',
+    `<rect class="w" x="20" y="64" width="200" height="106"/>
     <line class="h" x1="20" y1="170" x2="60" y2="145"/><line class="h" x1="60" y1="145" x2="260" y2="145"/><line class="h" x1="60" y1="25" x2="60" y2="145"/>
-    <rect class="s" x="20" y="50" width="200" height="120"/>
-    <polyline class="s" points="20,50 60,25 260,25 220,50"/><polyline class="s" points="260,25 260,145 220,170"/>
-    <line class="d" x1="20" y1="64" x2="220" y2="64"/>
-    <text class="lbl" x="95" y="190">35 cm</text><text class="lbl" x="246" y="174">17 cm</text><text class="lbl" x="268" y="92">25 cm</text></svg>`,
-  wxyz: `<svg viewBox="0 0 300 180" width="300" role="img" aria-label="Parallelogram WXYZ with diagonals meeting at P">
-    <polygon class="s" points="70,30 270,30 230,150 30,150"/>
-    <line class="d" x1="70" y1="30" x2="230" y2="150"/><line class="d" x1="270" y1="30" x2="30" y2="150"/>
-    <circle class="pt" cx="150" cy="90" r="3.5"/>
-    <text x="54" y="24">W</text><text x="274" y="24">X</text><text x="236" y="170">Y</text><text x="14" y="170">Z</text><text x="144" y="116">P</text></svg>`,
-  abcd: `<svg viewBox="0 0 300 180" width="300" role="img" aria-label="Parallelogram ABCD with diagonal AC">
-    <polygon class="s" points="30,150 70,30 270,30 230,150"/>
-    <line class="d" x1="30" y1="150" x2="270" y2="30"/>
-    <text x="14" y="170">A</text><text x="54" y="24">B</text><text x="274" y="24">C</text><text x="236" y="170">D</text></svg>`
+    <rect class="s" x="20" y="50" width="200" height="120"/><polyline class="s" points="20,50 60,25 260,25 220,50"/><polyline class="s" points="260,25 260,145 220,170"/>
+    <line class="d" x1="20" y1="64" x2="220" y2="64"/>${tx(95, 190, '35 cm', 'lbl')}${tx(246, 174, '17 cm', 'lbl')}${tx(268, 92, '25 cm', 'lbl')}`),
+  q5: svg(220, 215, 'Triangle ACE', `<polygon class="s" points="60,25 150,135 60,190"/>${tx(54, 18, 'A')}${tx(156, 140, 'E')}${tx(52, 208, 'C')}`),
+  q7: svg(280, 200, 'Right triangle ABC with legs 6 and 8, right angle at B',
+    `<polygon class="s" points="40,20 40,170 250,170"/><path class="s" d="M40 156 H54 V170"/>${tx(34, 14, 'A')}${tx(26, 188, 'B')}${tx(254, 188, 'C')}${tx(22, 100, '6', 'lbl')}${tx(140, 188, '8', 'lbl')}`),
+  q8: svg(340, 200, 'Triangle ABC with line CE perpendicular bisector of AB',
+    `<polygon class="s" points="40,150 300,150 170,55"/><line class="s" x1="170" y1="15" x2="170" y2="185"/>
+    <path class="s" d="M164 24 L170 13 L176 24 M164 176 L170 187 L176 176"/>${rightMark(170, 150, 12, -12)}
+    ${tx(150, 52, 'C')}${tx(22, 156, 'A')}${tx(306, 156, 'B')}${tx(152, 170, 'E')}`),
+  q9: svg(290, 200, 'Right triangle ABC, right angle at B, altitude BD to hypotenuse AC',
+    `<polygon class="s" points="40,20 40,180 253,180"/><line class="s" x1="40" y1="180" x2="116.8" y2="77.7"/>${rightMark(40, 180, 12, -12)}
+    ${tx(34, 14, 'A')}${tx(24, 196, 'B')}${tx(258, 194, 'C')}${tx(120, 72, 'D')}${tx(22, 105, '9', 'lbl')}${tx(140, 198, '12', 'lbl')}`),
+  q12: grid('Triangle RED and its dilation BLU on a grid',
+    { B: [1, 9, 5, -4], L: [-8, 3, -14, -4], U: [4, -9, 5, 12], R: [1, 3, 5, -4], E: [-2, 1, -14, -4], D: [2, -3, 5, 12] }, [['B', 'L', 'U'], ['R', 'E', 'D']]),
+  q14: svg(350, 190, 'Right triangle EFG with altitude ET to hypotenuse FG',
+    `<polygon class="s" points="20,160 328,160 260,32"/><line class="s" x1="260" y1="32" x2="260" y2="160"/>
+    <path class="s" d="M248 160 V148 H260"/>${tx(10, 180, 'F')}${tx(254, 180, 'T')}${tx(326, 180, 'G')}${tx(254, 24, 'E')}`),
+  q17: svg(290, 190, 'Circle T with tangent AS and secant ELS',
+    `<circle class="s" cx="100" cy="100" r="70"/><line class="s" x1="100" y1="30" x2="240" y2="30"/><line class="s" x1="240" y1="30" x2="70.4" y2="163.4"/>${dot(100, 100)}
+    ${tx(92, 22, 'A')}${tx(246, 34, 'S')}${tx(106, 96, 'T')}${tx(174, 98, 'L')}${tx(56, 182, 'E')}`),
+  q21: svg(260, 210, 'Circle D with radius 12 and central angle ADB of 150 degrees',
+    `<circle class="s" cx="120" cy="110" r="80"/><line class="s" x1="120" y1="110" x2="200" y2="110"/><line class="s" x1="120" y1="110" x2="50.7" y2="70"/>${dot(120, 110)}${dot(58.7, 161.4)}
+    ${tx(32, 66, 'A')}${tx(206, 115, 'B')}${tx(40, 178, 'C')}${tx(114, 130, 'D')}${tx(74, 104, '12', 'lbl')}${tx(124, 100, '150°', 'lbl')}`),
+  q23: svg(350, 210, 'Segments AC and ED cross at B, with AE parallel to CD',
+    `<polyline class="s" points="30,190 150,20 290,106.7 330,50 30,190"/>${tx(144, 14, 'A')}${tx(250, 76, 'B')}${tx(284, 126, 'C')}${tx(336, 50, 'D')}${tx(14, 204, 'E')}`),
+  q25: grid('Triangles DAN and MIK on a grid',
+    { D: [-6, 9, -14, -4], A: [-1, 8, 5, -4], N: [-3, 4, -4, 16], M: [6, -2, 5, -4], I: [1, -3, -12, -4], K: [3, -7, -4, 16] }, [['D', 'A', 'N'], ['M', 'I', 'K']]),
+  q26: svg(360, 175, 'Parallelogram LEAD with segment SC perpendicular to diagonal DE',
+    `<polygon class="s" points="80,20 330,20 290,150 40,150"/><line class="s" x1="40" y1="150" x2="330" y2="20"/><line class="s" x1="214" y1="72" x2="249" y2="150"/>
+    ${tx(72, 14, 'L')}${tx(334, 14, 'E')}${tx(294, 168, 'A')}${tx(26, 168, 'D')}${tx(206, 64, 'C')}${tx(244, 168, 'S')}`),
+  q28: svg(360, 160, 'Triangle ADC with B on AC and F on AD',
+    `<polygon class="s" points="40,20 330,20 180,140"/><line class="s" x1="120" y1="88.6" x2="205.7" y2="20"/>
+    ${tx(26, 18, 'A')}${tx(334, 18, 'D')}${tx(176, 158, 'C')}${tx(104, 102, 'B')}${tx(200, 14, 'F')}${tx(64, 66, '40', 'lbl')}${tx(156, 126, '30', 'lbl')}`),
+  q29: svg(340, 175, 'Triangle CLM with CL 8, CM 15 and angle C 33 degrees',
+    `<polygon class="s" points="20,150 320,150 154.2,62.9"/>${tx(6, 168, 'C')}${tx(322, 168, 'M')}${tx(150, 54, 'L')}${tx(74, 98, '8', 'lbl')}${tx(166, 168, '15', 'lbl')}${tx(46, 144, '33°', 'lbl')}`),
+  q30: svg(330, 190, 'Triangle ABC', `<polygon class="s" points="40,170 120,30 310,170"/>${tx(112, 22, 'A')}${tx(24, 186, 'B')}${tx(312, 186, 'C')}`),
+  q30sol: svg(330, 190, 'Angle bisector of angle B constructed with compass arcs',
+    `<polygon class="s" points="40,170 120,30 310,170"/>${arc(40, 170, 70, -6, 68)}${arc(74.7, 109.2, 55, -28, 8)}${arc(110, 170, 55, 52, 88)}
+    <line class="d" x1="40" y1="170" x2="191" y2="82.4"/>${dot(128.9, 118.4)}${tx(112, 22, 'A')}${tx(24, 186, 'B')}${tx(312, 186, 'C')}`),
+  q32: svg(340, 215, 'Maria at M looks up 36 degrees to T and down 18 degrees to B, 80 feet away',
+    `<rect class="s" x="50" y="90" width="40" height="95"/><rect class="s" x="260" y="30" width="40" height="155"/><line class="s" x1="20" y1="185" x2="320" y2="185"/>
+    <line class="d" x1="90" y1="110" x2="260" y2="30"/><line class="d" x1="90" y1="110" x2="260" y2="185"/><line class="h" x1="90" y1="110" x2="260" y2="110"/>
+    ${tx(76, 106, 'M')}${tx(84, 202, 'A')}${tx(254, 202, 'B')}${tx(254, 24, 'T')}${tx(244, 106, 'H')}${tx(110, 100, '36°', 'lbl')}${tx(110, 128, '18°', 'lbl')}${tx(156, 207, '80 ft', 'lbl')}`),
+  q33: svg(300, 200, 'Square pyramid with base sides 12 cm and height 8 cm',
+    `<polyline class="h" points="40,160 130,135 260,150"/><line class="h" x1="150" y1="30" x2="130" y2="135"/><line class="h" x1="150" y1="30" x2="150" y2="152"/>
+    <polygon class="s" points="40,160 170,180 260,150 150,30"/><line class="s" x1="170" y1="180" x2="150" y2="30"/>
+    ${tx(84, 192, '12 cm', 'lbl')}${tx(214, 186, '12 cm', 'lbl')}${tx(156, 100, '8', 'lbl')}`),
+  q34: svg(300, 200, 'Isosceles triangle ABC with DE and HF perpendicular to BC',
+    `<polygon class="s" points="150,20 40,180 260,180"/><line class="s" x1="78.5" y1="124" x2="78.5" y2="180"/><line class="s" x1="188.5" y1="76" x2="188.5" y2="180"/>
+    ${tx(144, 14, 'A')}${tx(24, 196, 'B')}${tx(264, 196, 'C')}${tx(62, 120, 'D')}${tx(194, 72, 'H')}${tx(72, 196, 'E')}${tx(182, 196, 'F')}`),
+  wxyz: svg(300, 180, 'Parallelogram WXYZ with diagonals meeting at P',
+    `<polygon class="s" points="70,30 270,30 230,150 30,150"/><line class="d" x1="70" y1="30" x2="230" y2="150"/><line class="d" x1="270" y1="30" x2="30" y2="150"/>${dot(150, 90)}
+    ${tx(54, 24, 'W')}${tx(274, 24, 'X')}${tx(236, 170, 'Y')}${tx(14, 170, 'Z')}${tx(144, 116, 'P')}`),
+  qrst: svg(300, 170, 'Parallelogram QRST with diagonal SQ',
+    `<polygon class="s" points="80,30 260,30 210,140 30,140"/><line class="d" x1="30" y1="140" x2="260" y2="30"/>
+    ${tx(66, 24, 'R')}${tx(264, 24, 'Q')}${tx(214, 160, 'T')}${tx(14, 160, 'S')}`)
 };
 const s = t => `<span class="seg">${t}</span>`;
 
-/* ---------- questions ---------- */
-const REAL = 'June ’26 Regents';
+/* ---------- multiple-choice questions ---------- */
+const EX = 'June ’26 Regents';
 const Q = [
-  // From the June 23, 2026 Regents (photos)
-  { set: 'real', src: REAL + ' #1', topic: 'Transformations',
+  // ===== June 23, 2026 Regents, Part I (official key from NYSED) =====
+  { set: 'exam', n: 1, topic: 'Transformations',
     q: "Which transformation would result in the area of a rectangle's image being different from the area of its pre-image?",
     c: ['a reflection over the y-axis', 'a translation 4 units to the right', 'a rotation of 90° counterclockwise about the origin', 'a vertical stretch of scale factor 3 with respect to y = 0'], a: 3,
     ex: 'Reflections, translations and rotations are rigid motions. They keep size and shape the same, so area stays the same. A vertical stretch by 3 makes the height 3 times bigger, so the area triples.' },
-  { set: 'real', src: REAL + ' #2', topic: 'Midsegments', fig: 'midseg',
-    q: `In the diagram of △ABC, points D and E are the midpoints of ${s('CA')} and ${s('CB')}, respectively. Which statement must always be true?`,
+  { set: 'exam', n: 2, topic: 'Midsegments', fig: 'midseg',
+    q: `In the diagram below of △ABC, points D and E are the midpoints of ${s('CA')} and ${s('CB')}, respectively. Which statement must always be true?`,
     c: ['DE = ½AB', 'DE = ½AC', 'AD = ½AB', 'AB = ½DE'], a: 0,
     ex: `D and E are midpoints of two sides, so ${s('DE')} is a midsegment. A midsegment is parallel to the third side (${s('AB')}) and half as long. Choice (4) is backwards: AB = 2·DE.` },
-  { set: 'real', src: REAL + ' #3', topic: 'Trigonometry', fig: 'trig',
-    q: `In triangle RJM, m∠R = 90° and MR = 7.25 inches. If the measure of angle M is 35°, what is the length of ${s('MJ')}, to the nearest hundredth of an inch?`,
+  { set: 'exam', n: 3, topic: 'Trigonometry', fig: 'trig',
+    q: `In triangle RJM below, m∠R = 90° and MR = 7.25 inches. If the measure of angle M is 35°, what is the length of ${s('MJ')}, to the nearest hundredth of an inch?`,
     c: ['4.16', '5.94', '8.85', '12.64'], a: 2,
-    ex: `${s('MR')} is adjacent to ∠M, and ${s('MJ')} is the hypotenuse (it is across from the right angle). Use CAH: cos 35° = 7.25 ÷ MJ, so MJ = 7.25 ÷ cos 35° ≈ 7.25 ÷ 0.8192 ≈ 8.85. The wrong choices come from using sin or multiplying instead of dividing.` },
-  { set: 'real', src: REAL + ' #4', topic: 'Volume', fig: 'tank',
-    q: 'A fish tank shaped like a rectangular prism is 35 cm long, 17 cm wide and 25 cm high. If it is filled with water to a height 3 cm from the top, how many liters of water are in the tank, to the nearest liter? [1 liter = 1000 cm³]',
+    ex: `${s('MR')} is adjacent to ∠M and ${s('MJ')} is the hypotenuse. CAH: cos 35° = 7.25 ÷ MJ, so MJ = 7.25 ÷ cos 35° ≈ 8.85. The wrong choices come from using sin, or multiplying instead of dividing.` },
+  { set: 'exam', n: 4, topic: 'Volume', fig: 'tank',
+    q: 'A fish tank in the shape of a rectangular prism with a length of 35 cm, width of 17 cm, and a height of 25 cm is shown below. If the fish tank is filled with water to a height 3 centimeters from the top, how many liters of water are in this tank, to the nearest liter? [1 liter = 1000 cubic centimeters]',
     c: ['10', '13', '15', '17'], a: 1,
-    ex: 'The water is 25 − 3 = 22 cm deep. V = 35 · 17 · 22 = 13,090 cm³. Divide by 1000 to get 13.09, so about 13 liters. Choice (3) is the trap: it uses the full 25 cm.' },
+    ex: 'The water is 25 − 3 = 22 cm deep. V = 35 · 17 · 22 = 13,090 cm³ = 13.09 L, so about 13 liters. Choice (3) uses the full 25 cm.' },
+  { set: 'exam', n: 5, topic: 'Transformations', fig: 'q5',
+    q: `Triangle ACE is drawn below. Triangle ACE is mapped onto triangle AXE after a reflection over side ${s('AE')}. Triangle AXE is then mapped onto triangle LXE after a reflection over side ${s('XE')}. Which side of △LXE is the image of ${s('AC')}?`,
+    c: [s('LE'), s('AX'), s('XE'), s('LX')], a: 3,
+    ex: `Track the letters. Reflecting over ${s('AE')} keeps A and E and sends C to X, so ${s('AC')} → ${s('AX')}. Reflecting over ${s('XE')} keeps X and E and sends A to L, so ${s('AX')} → ${s('LX')}.` },
+  { set: 'exam', n: 6, topic: 'Coordinate geometry',
+    q: 'The lines whose equations are represented by y = −½x + 2 and x + 2y = 8 are',
+    c: ['parallel', 'perpendicular', 'the same line', 'neither parallel nor perpendicular'], a: 0,
+    ex: 'Solve x + 2y = 8 for y: y = −½x + 4. Both lines have slope −½ but different y-intercepts (2 and 4), so they are parallel.' },
+  { set: 'exam', n: 7, topic: 'Volume', fig: 'q7',
+    q: `Right triangle ABC below has legs whose lengths are 6 and 8. What is the volume of the three-dimensional object formed by continuously rotating △ABC about ${s('AB')}?`,
+    c: ['96π', '128π', '288π', '384π'], a: 1,
+    ex: 'Spinning the triangle around leg AB makes a cone. AB = 6 is the height and BC = 8 is the radius. V = ⅓πr²h = ⅓π(8²)(6) = 128π. Choice (4) forgets the ⅓.' },
+  { set: 'exam', n: 8, topic: 'Triangles', fig: 'q8',
+    q: `In △ABC below, line CE is the perpendicular bisector of ${s('AEB')}. Which statement is always true?`,
+    c: [`${s('AC')} ≅ ${s('BC')}`, `${s('AE')} ≅ ${s('CE')}`, '∠EAC ≅ ∠BCE', 'm∠A + m∠B = 90°'], a: 0,
+    ex: 'Every point on the perpendicular bisector of a segment is the same distance from both endpoints. C is on it, so AC = BC.' },
+  { set: 'exam', n: 9, topic: 'Trigonometry', fig: 'q9',
+    q: `In right triangle ABC below, AB = 9, BC = 12, and altitude ${s('BD')} is drawn to hypotenuse ${s('AC')}. Which equation is always true for ${s('BD')}?`,
+    c: ['cos A = BD/9', 'sin C = BD/12', 'tan A = BD/9', 'sin C = BD/15'], a: 1,
+    ex: 'BD is an altitude, so △BDC has a right angle at D and hypotenuse BC = 12. BD is opposite ∠C, so sin C = BD/12. In △ABD, BD/9 would be sin A, not cos A or tan A.' },
+  { set: 'exam', n: 10, topic: 'Transformations',
+    q: 'Which regular polygon, when rotated about its center, carries onto itself after both a 120° rotation and a 180° rotation?',
+    c: ['triangle', 'square', 'hexagon', 'octagon'], a: 2,
+    ex: 'A regular n-gon carries onto itself with rotations that are multiples of 360° ÷ n. Hexagon: 60°, so 120° and 180° both work. Triangle (120°) fails 180°, square (90°) fails 120°, octagon (45°) fails 120°.' },
+  { set: 'exam', n: 11, topic: 'Coordinate geometry',
+    q: `The coordinates of the endpoints of ${s('PA')} are P(3, −6) and A(−2, 9). If point C is on ${s('PA')}, what are the coordinates of C such that PC:CA = 1:4?`,
+    c: ['(−1, 6)', '(0, 3)', '(1, 0)', '(2, −3)'], a: 3,
+    ex: 'A 1:4 ratio means C is 1/5 of the way from P to A. From P to A, x changes by −5 and y by +15. One fifth of that is −1 and +3, so C = (3 − 1, −6 + 3) = (2, −3).' },
+  { set: 'exam', n: 12, topic: 'Dilations', fig: 'q12',
+    q: 'On the set of axes below, △BLU is the image of △RED after a dilation. What are the scale factor and the coordinates of the center of dilation of this transformation?',
+    c: ['2 and (0, 0)', '2 and (1, 0)', '3 and (0, 0)', '3 and (1, 0)'], a: 3,
+    ex: 'Read the points: R(1, 3) → B(1, 9), E(−2, 1) → L(−8, 3), D(2, −3) → U(4, −9). Lines through matching points meet at (1, 0). From (1, 0), R is 3 units up and B is 9 units up, so the scale factor is 3.' },
+  { set: 'exam', n: 13, topic: 'Circles',
+    q: 'What are the coordinates of the center and the length of the radius of the circle whose equation is x² + y² = 45 + 4x?',
+    c: ['center (2, 0) and radius 7', 'center (−2, 0) and radius 7', 'center (2, 0) and radius 49', 'center (−2, 0) and radius 49'], a: 0,
+    ex: 'Move 4x over: x² − 4x + y² = 45. Complete the square: (x − 2)² + y² = 49. Center (2, 0), radius √49 = 7. Radius 49 is the trap, because 49 is r².' },
+  { set: 'exam', n: 14, topic: 'Similar triangles', fig: 'q14',
+    q: `In right triangle EFG below, altitude ${s('ET')} is drawn to hypotenuse ${s('FG')}. If EF = 17 and FT = 15, what is the length of ${s('TG')}, to the nearest tenth?`,
+    c: ['3.8', '4.3', '8.0', '9.1'], a: 1,
+    ex: 'In right △EFT, ET = √(17² − 15²) = 8. The altitude to the hypotenuse is the geometric mean of the two pieces: ET² = FT · TG, so 64 = 15 · TG and TG ≈ 4.3.' },
+  { set: 'exam', n: 15, topic: 'Quadrilaterals',
+    q: `In trapezoid ERJT, sides ${s('ER')} and ${s('TJ')} are parallel. If m∠R = (2x + 15)° and m∠J = (3x − 40)°, what is m∠J?`,
+    c: ['125°', '97°', '83°', '55°'], a: 2,
+    ex: '∠R and ∠J are on the same leg (RJ) between the parallel sides, so they are same-side interior angles and add to 180°. (2x + 15) + (3x − 40) = 180 gives x = 41, so m∠J = 3(41) − 40 = 83°.' },
+  { set: 'exam', n: 16, topic: 'Right triangles',
+    q: `In isosceles right triangle ABC, the length of hypotenuse ${s('AC')} is 14. What is the length of ${s('BC')}, to the nearest tenth?`,
+    c: ['7.0', '8.1', '9.9', '19.8'], a: 2,
+    ex: 'In a 45-45-90 triangle, hypotenuse = leg · √2. So leg = 14 ÷ √2 ≈ 9.9.' },
+  { set: 'exam', n: 17, topic: 'Circles', fig: 'q17',
+    q: `In circle T below, tangent ${s('AS')} and secant ${s('ELS')} are drawn. If SL = 8 and LE = 10, the length of ${s('AS')} is`,
+    c: ['√18', '√80', '9', '12'], a: 3,
+    ex: 'Tangent–secant rule: (tangent)² = (outside part) · (whole secant). AS² = 8 · (8 + 10) = 144, so AS = 12.' },
+  { set: 'exam', n: 18, topic: 'Parallelograms',
+    q: 'Parallelogram MERT has diagonals that intersect at I. Which additional statement is sufficient to prove MERT is a rhombus?',
+    c: ['∠ERT ≅ ∠RTM', '∠MEI ≅ ∠RTI', 'm∠TIM = 90°', `${s('ME')} ≅ ${s('RT')}`], a: 2,
+    ex: 'A parallelogram with perpendicular diagonals is a rhombus. m∠TIM = 90° means the diagonals are perpendicular. Choices (2) and (4) are true for every parallelogram, so they prove nothing new.' },
+  { set: 'exam', n: 19, topic: 'Trigonometry',
+    q: 'For the acute angles in right triangle ABC, sin(3x)° = cos(x + 10)°. What is the measure of the smallest angle in △ABC?',
+    c: ['5°', '15°', '30°', '60°'], a: 2,
+    ex: 'sin of an angle = cos of its complement, so 3x + (x + 10) = 90. That gives x = 20. The acute angles are 3(20) = 60° and 20 + 10 = 30°. The smallest is 30°.' },
+  { set: 'exam', n: 20, topic: 'Cross-sections',
+    q: 'Which two-dimensional shape below can not be a plane section of a rectangular prism?',
+    c: ['triangle', 'octagon', 'pentagon', 'trapezoid'], a: 1,
+    ex: 'A flat cut makes one edge on each face it crosses. A rectangular prism has 6 faces, so a cross-section has at most 6 sides. An octagon needs 8.' },
+  { set: 'exam', n: 21, topic: 'Circles', fig: 'q21',
+    q: 'Points A, B, and C are on circle D below such that DA = 12 and m∠ADB = 150°. The length of arc AB is',
+    c: ['5π', '10π', '24π', '60π'], a: 1,
+    ex: 'Arc length = (central angle ÷ 360) · 2πr = (150 ÷ 360) · 2π(12) = 10π.' },
+  { set: 'exam', n: 22, topic: 'Triangles',
+    q: 'The lengths of two sides of a triangle are 12 and 30. The length of the third side could be',
+    c: ['12', '18', '28', '42'], a: 2,
+    ex: 'Triangle inequality: the third side must be between 30 − 12 = 18 and 30 + 12 = 42, not equal to either. Only 28 works.' },
+  { set: 'exam', n: 23, topic: 'Similar triangles', fig: 'q23',
+    q: `In the diagram below, ${s('AC')} and ${s('ED')} intersect at B, and ${s('AE')} ∥ ${s('CD')}. If AB = 6, BC = 2, CD = 3, and BD = 4, what is the perimeter of △ABE?`,
+    c: ['9', '18', '21', '27'], a: 3,
+    ex: 'AE ∥ CD gives congruent alternate interior angles, and the angles at B are vertical angles, so △ABE ~ △CBD (AA). Scale factor AB/CB = 6/2 = 3. BE = 3 · 4 = 12 and AE = 3 · 3 = 9. Perimeter = 6 + 12 + 9 = 27.' },
+  { set: 'exam', n: 24, topic: 'Dilations',
+    q: 'On the coordinate plane, a line is dilated by a scale factor, centered at a point on the line. The image of the line has',
+    c: ['the same slope and the same y-intercept as the original line', 'the same y-intercept but a different slope as the original line', 'the same slope but a different y-intercept as the original line', 'a different slope and a different y-intercept than the original line'], a: 0,
+    ex: 'When the center of a dilation is on the line, every point slides along the line itself, so the line maps onto itself: same slope, same y-intercept.' },
 
-  // Unit 2 parallelograms, Regents style
+  // ===== Amplify Unit 2: parallelograms =====
+  { set: 'para', src: 'Go With the Flow', topic: 'Vocabulary', fig: 'qrst',
+    q: 'In parallelogram QRST, which pair of angles are opposite angles?',
+    c: ['∠Q and ∠R', '∠R and ∠T', '∠S and ∠T', '∠Q and ∠T'], a: 1,
+    ex: 'Opposite angles do not share a side. Going around Q → R → S → T, ∠R and ∠T are across from each other (so are ∠Q and ∠S). The other choices are adjacent (consecutive) angles.' },
+  { set: 'para', src: 'Go With the Flow', topic: 'Proofs', fig: 'qrst',
+    q: `The Amplify flowchart proof draws diagonal ${s('SQ')} to prove opposite sides of QRST are congruent. Which congruence statement does it use?`,
+    c: ['△SRQ ≅ △QTS', '△SRQ ≅ △STQ', '△RQS ≅ △QTS', '△SRQ ≅ △TQS'], a: 0,
+    ex: 'The diagonal splits QRST into △SRQ and △QTS. The letter order matters: S↔Q, R↔T, Q↔S. That match gives RQ ≅ TS and RS ≅ TQ by CPCTC. The other statements pair up the wrong vertices.' },
+  { set: 'para', src: 'Go With the Flow', topic: 'Proofs',
+    q: 'The "first draft" proof says: QRST is a parallelogram → △SRQ ≅ △QTS by ASA → opposite sides are congruent. What would make it stronger?',
+    c: ['Show where each A, S and A comes from: alternate interior angles from the parallel sides and the shared side SQ (reflexive)', 'Use AAA instead of ASA', 'Measure the sides with a ruler', 'Remove the diagonal'], a: 0,
+    ex: 'ASA needs two angles and the included side. A strong proof says why each one is congruent: parallel sides give alternate interior angles, and SQ ≅ QS by the reflexive property.' },
   { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Angles',
     q: 'In parallelogram ABCD, m∠A = (3x + 10)° and m∠C = (5x − 30)°. What is m∠A?',
     c: ['20°', '70°', '110°', '140°'], a: 1,
-    ex: 'Opposite angles of a parallelogram are congruent, so 3x + 10 = 5x − 30. That gives 40 = 2x, so x = 20. Then m∠A = 3(20) + 10 = 70°. Choice (1) is x, not the angle.' },
+    ex: 'Opposite angles of a parallelogram are congruent, so 3x + 10 = 5x − 30. That gives x = 20 and m∠A = 70°. Choice (1) is x, not the angle.' },
   { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Diagonals',
-    q: `The diagonals of parallelogram ABCD meet at E. If AE = 2x + 4 and EC = 5x − 11, what is AC?`,
+    q: 'The diagonals of parallelogram ABCD meet at E. If AE = 2x + 4 and EC = 5x − 11, what is AC?',
     c: ['5', '14', '28', '33'], a: 2,
-    ex: 'Diagonals of a parallelogram bisect each other, so AE = EC. 2x + 4 = 5x − 11 gives x = 5, so AE = 14. AC is the whole diagonal: 14 + 14 = 28.' },
+    ex: 'Diagonals of a parallelogram bisect each other, so AE = EC. 2x + 4 = 5x − 11 gives x = 5, so AE = 14 and AC = 28.' },
   { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Angles',
     q: 'In parallelogram ABCD, m∠A = (2x + 30)° and m∠B = (4x)°. What is m∠B?',
     c: ['25°', '80°', '100°', '120°'], a: 2,
-    ex: '∠A and ∠B are consecutive angles, so they are supplementary (add to 180°). 2x + 30 + 4x = 180, so 6x = 150 and x = 25. m∠B = 4(25) = 100°.' },
+    ex: '∠A and ∠B are consecutive angles, so they add to 180°. 6x + 30 = 180, x = 25, m∠B = 100°.' },
   { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Properties',
     q: 'Which statement is NOT always true for every parallelogram?',
     c: ['Opposite sides are congruent.', 'Opposite angles are congruent.', 'The diagonals are congruent.', 'The diagonals bisect each other.'], a: 2,
@@ -493,69 +717,185 @@ const Q = [
   { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Special parallelograms',
     q: `Parallelogram ABCD has diagonals ${s('AC')} and ${s('BD')} with AC = BD. Which type of quadrilateral must ABCD be?`,
     c: ['rectangle', 'rhombus', 'square', 'trapezoid'], a: 0,
-    ex: 'A parallelogram with congruent diagonals is a rectangle. It might also be a square, but it does not have to be, so "rectangle" is what must be true.' },
+    ex: 'A parallelogram with congruent diagonals is a rectangle. It might be a square, but it does not have to be. (This is Regents question #31.)' },
   { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Special parallelograms',
     q: 'A parallelogram has diagonals that are perpendicular to each other. Which type of quadrilateral must it be?',
     c: ['rectangle', 'rhombus', 'square', 'trapezoid'], a: 1,
-    ex: 'Perpendicular diagonals in a parallelogram make it a rhombus. A square has that too, but you would also need right angles to call it a square.' },
+    ex: 'Perpendicular diagonals in a parallelogram make it a rhombus. (This is Regents question #18.)' },
   { set: 'para', src: 'Regents style', topic: 'Coordinate geometry',
     q: 'Quadrilateral ABCD has vertices A(0, 0), B(4, 0), C(6, 3) and D(2, 3). Which statement best describes ABCD?',
     c: ['It is a parallelogram, but not a rectangle or a rhombus.', 'It is a rectangle.', 'It is a rhombus.', 'It is a square.'], a: 0,
-    ex: `Slopes: ${s('AB')} and ${s('DC')} are both 0; ${s('AD')} and ${s('BC')} are both 3/2. Two pairs of parallel sides make a parallelogram. AB = 4 but AD = √13 ≈ 3.6, so the sides are not all equal (not a rhombus). Slopes 0 and 3/2 are not perpendicular, so there are no right angles (not a rectangle).` },
+    ex: `Slopes: ${s('AB')} and ${s('DC')} are 0; ${s('AD')} and ${s('BC')} are 3/2. Two pairs of parallel sides make a parallelogram. AB = 4 but AD = √13, so it is not a rhombus. Slopes 0 and 3/2 are not perpendicular, so it is not a rectangle.` },
   { set: 'para', src: 'Regents style', topic: 'Coordinate geometry',
     q: 'Parallelogram ABCD has vertices A(−2, 1), B(4, 3) and C(6, −1). What are the coordinates of D?',
     c: ['(0, −3)', '(12, 1)', '(−4, 5)', '(2, −1)'], a: 0,
-    ex: `The diagonals bisect each other, so they share a midpoint. Midpoint of ${s('AC')} = ((−2+6)/2, (1−1)/2) = (2, 0). For ${s('BD')}: (4 + x)/2 = 2 gives x = 0, and (3 + y)/2 = 0 gives y = −3. So D = (0, −3).` },
+    ex: `The diagonals share a midpoint. Midpoint of ${s('AC')} = (2, 0). For ${s('BD')}: (4 + x)/2 = 2 gives x = 0, and (3 + y)/2 = 0 gives y = −3. D = (0, −3).` },
   { set: 'para', src: 'Regents style', topic: 'Transformations',
     q: 'Which transformation always carries a parallelogram onto itself?',
     c: ['a reflection over one of its diagonals', 'a rotation of 90° about the intersection of its diagonals', 'a rotation of 180° about the intersection of its diagonals', 'a reflection over a line through the midpoints of two opposite sides'], a: 2,
-    ex: 'Every parallelogram has 180° rotational symmetry around the point where its diagonals cross. Reflections and 90° turns only work for special cases like rhombuses, rectangles or squares.' },
+    ex: 'Every parallelogram has 180° rotational symmetry around the point where its diagonals cross. Reflections and 90° turns only work for special parallelograms.' },
   { set: 'para', src: 'Regents style', topic: 'Special parallelograms',
     q: 'In rectangle RECT, diagonal RC = 3x + 2 and diagonal ET = 5x − 10. What is RC?',
     c: ['6', '10', '20', '40'], a: 2,
-    ex: 'Diagonals of a rectangle are congruent, so 3x + 2 = 5x − 10. That gives x = 6, and RC = 3(6) + 2 = 20.' },
+    ex: 'Diagonals of a rectangle are congruent: 3x + 2 = 5x − 10, x = 6, RC = 20.' },
   { set: 'para', src: 'Regents style', topic: 'Special parallelograms',
     q: 'The diagonals of rhombus ABCD meet at E. If m∠ABE = 35°, what is m∠BAE?',
     c: ['35°', '55°', '70°', '90°'], a: 1,
-    ex: 'Diagonals of a rhombus are perpendicular, so m∠AEB = 90°. The angles in △ABE add to 180°: 180 − 90 − 35 = 55°.' },
+    ex: 'Rhombus diagonals are perpendicular, so m∠AEB = 90°. In △ABE: 180 − 90 − 35 = 55°.' },
   { set: 'para', src: 'Activity 3', topic: 'Proof reasons', fig: 'wxyz',
     q: `In parallelogram WXYZ, diagonals ${s('WY')} and ${s('XZ')} meet at P. Which reason proves ∠WXZ ≅ ∠YZX?`,
     c: ['Vertical angles are congruent.', 'Parallel lines cut by a transversal form congruent alternate interior angles.', 'Opposite angles of a parallelogram are congruent.', 'Reflexive property'], a: 1,
-    ex: `${s('WX')} ∥ ${s('ZY')} and ${s('XZ')} is a transversal. ∠WXZ and ∠YZX are on opposite sides of the transversal, between the parallel lines, so they are alternate interior angles.` },
+    ex: `${s('WX')} ∥ ${s('ZY')} and ${s('XZ')} is a transversal. ∠WXZ and ∠YZX are alternate interior angles.` },
   { set: 'para', src: 'Activity 3', topic: 'Proof reasons', fig: 'wxyz',
     q: 'After proving △WPX ≅ △YPZ, which statement follows from CPCTC and shows the diagonals bisect each other?',
     c: [`${s('WP')} ≅ ${s('YP')} and ${s('XP')} ≅ ${s('ZP')}`, `${s('WX')} ≅ ${s('YZ')}`, '∠WPX ≅ ∠YPZ', `${s('WY')} ≅ ${s('XZ')}`], a: 0,
-    ex: 'CPCTC means corresponding parts of congruent triangles are congruent. WP ≅ YP and XP ≅ ZP mean P cuts each diagonal into 2 equal pieces, which is what "bisect" means.' },
+    ex: 'WP ≅ YP and XP ≅ ZP mean P cuts each diagonal into 2 equal pieces, which is what "bisect" means.' },
   { set: 'para', src: 'Unit 2 · Lesson 14', topic: 'Special parallelograms',
     q: 'Which property is true for every square but NOT for every rhombus?',
     c: ['The diagonals are perpendicular.', 'The diagonals bisect each other.', 'The diagonals are congruent.', 'All four sides are congruent.'], a: 2,
-    ex: 'Rhombuses and squares both have 4 equal sides and perpendicular diagonals. Only the square (because it is also a rectangle) has congruent diagonals.' },
+    ex: 'Rhombuses and squares both have 4 equal sides and perpendicular diagonals. Only the square (also a rectangle) has congruent diagonals.' },
 
-  // More Regents-style practice
+  // ===== Amplify practice: congruence and transformations =====
+  { set: 'cong', src: 'Practice Geo.2.08', topic: 'Triangle congruence',
+    q: 'Two triangles have all three pairs of corresponding angles congruent. What can you conclude?',
+    c: ['The triangles must be congruent.', 'The triangles might not be congruent. They could be different sizes.', 'The triangles are congruent by ASA.', 'The triangles are congruent by SAS.'], a: 1,
+    ex: 'From the lesson summary: three pairs of congruent angles (AAA) does not guarantee congruence. One triangle can be a bigger copy of the other.' },
+  { set: 'cong', src: 'Practice Geo.2.08', topic: 'Triangle congruence',
+    q: 'Which information always proves two triangles are congruent?',
+    c: ['three pairs of congruent corresponding sides', 'three pairs of congruent corresponding angles', 'two pairs of congruent sides and a non-included angle', 'one pair of congruent sides'], a: 0,
+    ex: 'SSS: three pairs of congruent corresponding sides always means the triangles are congruent. AAA and SSA do not work.' },
+  { set: 'cong', src: 'Practice Geo.2.09', topic: 'Triangle congruence',
+    q: 'Which of these is NOT a valid way to prove two triangles congruent?',
+    c: ['SAS', 'ASA', 'AAS', 'SSA'], a: 3,
+    ex: 'SSA (two sides and an angle that is not between them) can make two different triangles, so it does not prove congruence. Valid: SSS, SAS, ASA, AAS, and HL for right triangles.' },
+  { set: 'cong', src: 'Practice Geo.2.09', topic: 'Triangle congruence',
+    q: 'In two triangles, two pairs of angles are congruent and the sides between those angles are congruent. Which criterion proves the triangles congruent?',
+    c: ['SSS', 'SAS', 'ASA', 'HL'], a: 2,
+    ex: 'Angle, included Side, Angle: ASA. The side has to be between the two angles.' },
+  { set: 'cong', src: 'Practice Geo.2.09', topic: 'Triangle congruence',
+    q: 'In two triangles, two pairs of sides are congruent and the angles between those sides are congruent. Which criterion proves the triangles congruent?',
+    c: ['SSS', 'SAS', 'ASA', 'AAS'], a: 1,
+    ex: 'Side, included Angle, Side: SAS. The angle has to be between the two sides.' },
+  { set: 'cong', src: 'Practice Geo.2.07', topic: 'Congruence statements',
+    q: '△ABC ≅ △DEF. Which statement must be true?',
+    c: ['∠B ≅ ∠E', `${s('AB')} ≅ ${s('EF')}`, '∠C ≅ ∠D', `${s('BC')} ≅ ${s('DF')}`], a: 0,
+    ex: 'The order of letters tells you what matches: A↔D, B↔E, C↔F. So ∠B ≅ ∠E. The others mix up the order.' },
+  { set: 'cong', src: 'Practice Geo.2.07', topic: 'Congruence statements',
+    q: `△PQR ≅ △XYZ. Which side of △XYZ corresponds to ${s('QR')}?`,
+    c: [s('XY'), s('YZ'), s('XZ'), s('ZY') + ' and ' + s('XY')], a: 1,
+    ex: 'Q is the 2nd letter and R is the 3rd. The 2nd and 3rd letters of XYZ are Y and Z, so QR ↔ YZ.' },
+  { set: 'cong', src: 'Practice Geo.2.06', topic: 'Corresponding parts',
+    q: 'A sequence of rigid motions takes △ABC exactly onto △DEF. What can you conclude?',
+    c: ['The triangles are congruent, so all corresponding sides and angles are congruent.', 'The triangles are similar but not congruent.', 'Only the angles are congruent.', 'Nothing, unless you measure the sides.'], a: 0,
+    ex: 'Rigid motions keep lengths and angle measures. If one figure maps onto the other, they are congruent and every pair of corresponding parts is congruent.' },
+  { set: 'cong', src: 'Practice Geo.2.10', topic: 'Constructions',
+    q: 'When you copy an angle with a compass and straightedge, which triangle congruence criterion explains why the copy is exact?',
+    c: ['SSS', 'SAS', 'ASA', 'AAA'], a: 0,
+    ex: 'Every compass setting copies a length. The construction builds a triangle whose three sides match the original, so the triangles are congruent by SSS and the angles match.' },
+  { set: 'cong', src: 'Practice Geo.1.05', topic: 'Constructions',
+    q: 'Every point on the perpendicular bisector of a segment is',
+    c: ['the midpoint of the segment', 'equidistant from the endpoints of the segment', 'on the segment', 'twice as far from one endpoint as the other'], a: 1,
+    ex: 'That is the key fact about perpendicular bisectors. It also explains Regents question #8.' },
+  { set: 'cong', src: 'Practice Geo.1.11', topic: 'Rotations',
+    q: 'What is the image of the point (3, 1) after a rotation of 90° counterclockwise about the origin?',
+    c: ['(−1, 3)', '(1, −3)', '(−3, −1)', '(3, −1)'], a: 0,
+    ex: 'The rule for 90° counterclockwise is (x, y) → (−y, x). (3, 1) → (−1, 3).' },
+  { set: 'cong', src: 'Practice Geo.1.12', topic: 'Sequences of transformations',
+    q: 'The point (2, 5) is reflected over the x-axis and then translated 3 units left. Where does it end up?',
+    c: ['(−1, −5)', '(5, −5)', '(−2, 5)', '(−1, 5)'], a: 0,
+    ex: 'Reflect over the x-axis: (x, y) → (x, −y), so (2, −5). Then 3 units left: (−1, −5).' },
+  { set: 'cong', src: 'Practice Geo.2.08', topic: 'Sequences of transformations', fig: 'q25',
+    q: '△DAN ≅ △MIK (this is Regents #25). Which sequence of rigid motions maps △DAN onto △MIK?',
+    c: ['a reflection over the y-axis, then a translation 11 units down', 'a translation 11 units down only', 'a rotation of 180° about the origin', 'a reflection over the x-axis only'], a: 0,
+    ex: 'D(−6, 9), A(−1, 8), N(−3, 4). Reflect over the y-axis: (6, 9), (1, 8), (3, 4). Translate down 11: (6, −2), (1, −3), (3, −7), which are M, I and K.' },
+
+  // ===== More Regents-style practice =====
   { set: 'regents', src: 'Regents style', topic: 'Midsegments',
     q: `In △ABC, D is the midpoint of ${s('CA')} and E is the midpoint of ${s('CB')}. If DE = 2x + 3 and AB = 6x − 4, what is AB?`,
     c: ['5', '13', '26', '52'], a: 2,
-    ex: 'The midsegment is half the third side, so AB = 2·DE. 6x − 4 = 2(2x + 3) = 4x + 6, so 2x = 10 and x = 5. AB = 6(5) − 4 = 26.' },
+    ex: 'AB = 2·DE: 6x − 4 = 4x + 6, so x = 5 and AB = 26.' },
   { set: 'regents', src: 'Regents style', topic: 'Trigonometry',
-    q: 'A 20-foot ladder leans against a wall and makes a 70° angle with the ground. How high up the wall does the ladder reach, to the nearest tenth of a foot?',
+    q: 'A 20-foot ladder leans against a wall and makes a 70° angle with the ground. How high up the wall does it reach, to the nearest tenth of a foot?',
     c: ['6.8', '7.3', '18.8', '21.3'], a: 2,
-    ex: 'The ladder is the hypotenuse and the height is opposite the 70° angle. SOH: sin 70° = h ÷ 20, so h = 20 · sin 70° ≈ 18.8 ft. Choice (1) uses cos by mistake.' },
+    ex: 'The height is opposite the 70° angle and the ladder is the hypotenuse: h = 20 · sin 70° ≈ 18.8 ft.' },
   { set: 'regents', src: 'Regents style', topic: 'Volume',
     q: 'A cylinder has a radius of 3 inches and a height of 10 inches. What is its volume, to the nearest tenth of a cubic inch?',
     c: ['94.2', '188.5', '282.7', '942.5'], a: 2,
-    ex: 'V = πr²h = π · 3² · 10 = 90π ≈ 282.7. Choice (2) is 60π, the side area, not the volume.' },
-  { set: 'regents', src: 'Regents style', topic: 'Transformations',
+    ex: 'V = πr²h = π(9)(10) = 90π ≈ 282.7.' },
+  { set: 'regents', src: 'Regents style', topic: 'Dilations',
     q: 'A triangle with an area of 5 square units is dilated by a scale factor of 3. What is the area of the image?',
     c: ['15', '25', '45', '135'], a: 2,
-    ex: 'Lengths get multiplied by 3, but area gets multiplied by 3² = 9. 5 · 9 = 45.' },
-  { set: 'regents', src: 'Regents style', topic: 'Transformations',
-    q: 'Which transformation does NOT always preserve distance?',
-    c: ['a reflection', 'a rotation', 'a translation', 'a dilation with a scale factor of 2'], a: 3,
-    ex: 'Reflections, rotations and translations are rigid motions. A dilation with scale factor 2 doubles every length.' },
+    ex: 'Area gets multiplied by 3² = 9. 5 · 9 = 45.' },
   { set: 'regents', src: 'Regents style', topic: 'Trigonometry',
     q: 'In right triangle ABC, ∠C is the right angle and sin A = 0.6. What is cos B?',
     c: ['0.4', '0.6', '0.8', '1.6'], a: 1,
-    ex: '∠A and ∠B are complementary (they add to 90°). The sine of an angle equals the cosine of its complement, so cos B = sin A = 0.6.' }
+    ex: '∠A and ∠B are complementary, so cos B = sin A = 0.6. (Same idea as Regents #19.)' }
+];
+
+/* ---------- Regents Parts II–IV ---------- */
+const WORK = [
+  { n: 25, part: 'II', cr: 2, fig: 'q25', type: 'text', topic: 'Rigid motions',
+    q: 'On the set of axes below, △DAN ≅ △MIK. Describe a sequence of rigid motions that maps △DAN onto △MIK.',
+    steps: ['Match the letters: D → M, A → I, N → K.', 'Read the points: D(−6, 9), A(−1, 8), N(−3, 4) and M(6, −2), I(1, −3), K(3, −7).',
+      'Reflect △DAN over the y-axis, (x, y) → (−x, y): D(6, 9), A(1, 8), N(3, 4).', 'Translate 11 units down, (x, y) → (x, y − 11): (6, −2), (1, −3), (3, −7). Those are M, I and K.'],
+    final: 'A reflection over the y-axis followed by a translation 11 units down.' },
+  { n: 26, part: 'II', cr: 2, fig: 'q26', type: 'num', ans: 111, tol: 0.5, unit: '°', topic: 'Parallelograms',
+    q: `In parallelogram LEAD below, C is on ${s('DE')} and S is on ${s('DA')} such that ${s('SC')} ⊥ ${s('DE')}. If m∠LED = 21°, determine and state the measure of ∠CSA.`,
+    steps: [`${s('LE')} ∥ ${s('DA')} (opposite sides of a parallelogram), so m∠EDA = m∠LED = 21° (alternate interior angles).`,
+      `${s('SC')} ⊥ ${s('DE')}, so m∠DCS = 90°. In △DCS: m∠CSD = 180 − 90 − 21 = 69°.`, '∠CSD and ∠CSA form a linear pair: m∠CSA = 180 − 69 = 111°.'],
+    final: 'm∠CSA = 111°' },
+  { n: 27, part: 'II', cr: 2, type: 'num', ans: 353, tol: 0.5, unit: 'pounds', topic: 'Volume and density',
+    q: 'A section of tree trunk from a white pine tree can be modeled by a cylinder. The diameter of the trunk is 1.5 feet, and the height of this section is 8 feet. If white pine weighs 25 pounds per cubic foot, determine and state the weight of this section of the white pine tree, to the nearest pound.',
+    steps: ['Radius = 1.5 ÷ 2 = 0.75 ft.', 'V = πr²h = π(0.75)²(8) = 4.5π ≈ 14.137 ft³.', 'Weight = 14.137 × 25 ≈ 353.4 pounds.'],
+    final: 'About 353 pounds' },
+  { n: 28, part: 'II', cr: 2, fig: 'q28', type: 'num', ans: 48, tol: 0.01, topic: 'Similar triangles',
+    q: `In △ADC below, points B and F are on ${s('AC')} and ${s('AD')}, respectively, such that AB = 40, BC = 30, and ${s('BF')} is drawn. If AF = 64, determine and state the length of ${s('FD')} that would prove ${s('BF')} ∥ ${s('CD')}.`,
+    steps: ['A segment is parallel to the third side exactly when it splits the other two sides proportionally: AB/BC = AF/FD.', '40/30 = 64/FD', '40 · FD = 30 · 64 = 1920, so FD = 48.'],
+    final: 'FD = 48' },
+  { n: 29, part: 'II', cr: 2, fig: 'q29', type: 'num', ans: 32.7, tol: 0.05, unit: 'square units', topic: 'Trigonometry',
+    q: 'In △CLM below, m∠C = 33°, CL = 8, and CM = 15. Determine and state, to the nearest tenth, the area of △CLM.',
+    steps: ['When you know two sides and the angle between them, use Area = ½ab · sin C (it is on the reference sheet).', 'Area = ½(8)(15) · sin 33° = 60 · sin 33°', '60 × 0.5446 ≈ 32.68'],
+    final: 'Area ≈ 32.7' },
+  { n: 30, part: 'II', cr: 2, fig: 'q30', solFig: 'q30sol', type: 'none', topic: 'Constructions',
+    q: 'In the diagram of △ABC below, use a compass and straightedge to construct the angle bisector of ∠ABC. [Leave all construction marks.]',
+    steps: ['Put the compass point on B. Draw an arc that crosses both sides of the angle, BA and BC.', 'Keep the same compass width (or any width more than half the gap). Put the point on each spot where the arc crossed a side, and draw two arcs that cross inside the angle.',
+      'Use the straightedge to draw a ray from B through the point where those two arcs cross. That ray is the angle bisector.'],
+    final: 'Leave every arc showing. The graders look for the construction marks.' },
+  { n: 31, part: 'II', cr: 2, type: 'none', topic: 'Parallelograms',
+    q: 'The diagonals of parallelogram GRAM intersect at P. If RP = 12 and GA = 24, explain why GRAM is a rectangle.',
+    steps: [`The diagonals of a parallelogram bisect each other, so P is the midpoint of ${s('RM')}. That makes RM = 2 · RP = 24.`, `GA = 24 too, so the diagonals are congruent: ${s('RM')} ≅ ${s('GA')}.`, 'A parallelogram with congruent diagonals is a rectangle.'],
+    final: 'GRAM is a rectangle because it is a parallelogram whose diagonals are congruent (both 24).' },
+  { n: 32, part: 'III', cr: 4, fig: 'q32', type: 'num', ans: 84, tol: 0.5, unit: 'feet', topic: 'Trigonometry',
+    q: 'As modeled below, Maria wants to determine the height of the building across the street from her position, M. The angle of elevation from M to the top of the building, T, is 36°. From M, the angle of depression to the base of the building, B, is 18°. The buildings are 80 feet apart. Determine and state, to the nearest foot, the height of the building, TB, across the street from Maria.',
+    steps: ['MH is horizontal, so MH = 80 ft. Split the building at H.', 'Top piece: tan 36° = TH / 80, so TH = 80 tan 36° ≈ 58.12 ft.', 'Bottom piece: tan 18° = HB / 80, so HB = 80 tan 18° ≈ 25.99 ft.', 'TB = TH + HB ≈ 58.12 + 25.99 ≈ 84.1 ft.'],
+    final: 'TB ≈ 84 feet' },
+  { n: 33, part: 'III', cr: 4, fig: 'q33', type: 'num', ans: 31, tol: 0.01, unit: 'pyramids', topic: 'Volume and density',
+    q: 'An artist uses clay to make solid pyramids with a square base whose sides measure 12 cm, as modeled below. The height of each pyramid is 8 cm, and the density of the clay is 1.25 g/cm³. If the artist has 15 kilograms of clay, determine and state the maximum number of pyramids that can be made.',
+    steps: ['V = ⅓Bh = ⅓(12 · 12)(8) = 384 cm³ for one pyramid.', 'Mass = volume × density = 384 × 1.25 = 480 g per pyramid.', '15 kg = 15,000 g. 15,000 ÷ 480 = 31.25.', 'You cannot make a quarter of a pyramid, so round down.'],
+    final: '31 pyramids' },
+  { n: 34, part: 'III', cr: 4, fig: 'q34', type: 'none', topic: 'Proofs',
+    q: `Given: Triangle ABC, ${s('AB')} ≅ ${s('AC')}, ${s('DE')} ⊥ ${s('BC')}, and ${s('HF')} ⊥ ${s('BC')}. Prove: DE/BE = HF/CF`,
+    steps: [`${s('AB')} ≅ ${s('AC')} (Given)`, '∠B ≅ ∠C (Base angles of an isosceles triangle are congruent)',
+      `${s('DE')} ⊥ ${s('BC')} and ${s('HF')} ⊥ ${s('BC')} (Given)`, '∠DEB and ∠HFC are right angles (Perpendicular lines form right angles)',
+      '∠DEB ≅ ∠HFC (All right angles are congruent)', '△DEB ~ △HFC (AA similarity)', 'DE/BE = HF/CF (Corresponding sides of similar triangles are proportional)'],
+    final: 'Practice this one step by step in Proof Builder.' },
+  { n: '35a', part: 'IV', cr: 6, type: 'pt', ans: [1, 5], topic: 'Coordinate proof',
+    q: 'Triangle ABC has vertices whose coordinates are A(−3, −1), B(−5, 2), and C(−1, 8). State the coordinates of point D such that quadrilateral ABCD is a parallelogram.',
+    steps: ['In parallelogram ABCD, side BA matches side CD. Going from B(−5, 2) to A(−3, −1) is right 2, down 3.', 'Do the same from C(−1, 8): right 2, down 3 gives D(1, 5).', 'Check: midpoint of AC = (−2, 3.5) and midpoint of BD = (−2, 3.5). They match, so the diagonals bisect each other.'],
+    final: 'D(1, 5)' },
+  { n: '35b', part: 'IV', cr: 6, type: 'none', topic: 'Coordinate proof',
+    q: 'Using A(−3, −1), B(−5, 2), C(−1, 8) and D(1, 5): prove ABCD is a parallelogram.',
+    steps: ['Slope AB = (2 − (−1)) / (−5 − (−3)) = 3/−2 = −3/2. Slope CD = (5 − 8) / (1 − (−1)) = −3/2.', 'Slope BC = (8 − 2) / (−1 − (−5)) = 6/4 = 3/2. Slope AD = (5 − (−1)) / (1 − (−3)) = 6/4 = 3/2.',
+      `Equal slopes mean parallel lines: ${s('AB')} ∥ ${s('CD')} and ${s('BC')} ∥ ${s('AD')}.`],
+    final: 'ABCD is a parallelogram because both pairs of opposite sides are parallel. Write that concluding sentence; it counts for credit.' },
+  { n: '35c', part: 'IV', cr: 6, type: 'pt', ans: [-3, 5], topic: 'Coordinate proof',
+    q: `Using B(−5, 2) and C(−1, 8): state the coordinates of point E, the midpoint of ${s('BC')}.`,
+    steps: ['Midpoint = ((x₁ + x₂)/2, (y₁ + y₂)/2)', 'E = ((−5 + −1)/2, (2 + 8)/2) = (−6/2, 10/2)'],
+    final: 'E(−3, 5)' },
+  { n: '35d', part: 'IV', cr: 6, type: 'none', topic: 'Coordinate proof',
+    q: 'Using A(−3, −1), B(−5, 2) and E(−3, 5): prove △ABE is an isosceles triangle.',
+    steps: ['AB = √((−5 − (−3))² + (2 − (−1))²) = √(4 + 9) = √13', 'BE = √((−3 − (−5))² + (5 − 2)²) = √(4 + 9) = √13', 'AE = √(0² + 6²) = 6'],
+    final: '△ABE is isosceles because two of its sides are congruent: AB = BE = √13.' }
 ];
 
 /* ---------- flashcards ---------- */
@@ -564,7 +904,9 @@ const CARDS = [
   ['Rectangle', 'A parallelogram with four right angles. Its diagonals are congruent.'],
   ['Rhombus', 'A parallelogram with four congruent sides. Its diagonals are perpendicular and bisect its angles.'],
   ['Square', 'A parallelogram that is both a rectangle and a rhombus: 4 right angles and 4 equal sides.'],
+  ['Trapezoid', 'A quadrilateral with at least one pair of parallel sides. Angles on the same leg add to 180°.'],
   ['Diagonal', 'A line segment that connects two non-adjacent vertices of a polygon.'],
+  ['Opposite vs. adjacent', 'Opposite sides/angles are across from each other. Adjacent ones are next to each other and share a side or vertex.'],
   ['Bisect', 'To cut into 2 equal pieces.'],
   ['Midpoint', 'The point that divides a segment into two congruent segments.'],
   ['CPCTC', 'Corresponding Parts of Congruent Triangles are Congruent. Use it after you prove two triangles congruent.'],
@@ -572,12 +914,25 @@ const CARDS = [
   ['Opposite angles of a parallelogram', 'They are congruent.'],
   ['Consecutive angles of a parallelogram', 'They are supplementary: they add up to 180°.'],
   ['Diagonals of a parallelogram', 'They bisect each other.'],
-  ['Triangle congruence shortcuts', 'SSS, SAS, ASA, AAS, and HL for right triangles. (No SSA or AAA!)'],
-  ['Reflexive property', 'Anything is congruent to itself, like AC ≅ CA. Use it for a shared side.'],
+  ['Triangle congruence shortcuts', 'SSS, SAS, ASA, AAS, and HL for right triangles. Not SSA or AAA!'],
+  ['Why not AAA?', 'Three congruent angles only proves the triangles are the same shape. One can be a bigger copy of the other.'],
+  ['Reflexive property', 'Anything is congruent to itself, like SQ ≅ QS. Use it for a side two triangles share.'],
+  ['Perpendicular bisector', 'A line through the midpoint of a segment at 90°. Every point on it is equidistant from the endpoints.'],
   ['Midsegment of a triangle', 'Connects midpoints of two sides. It is parallel to the third side and half as long.'],
   ['SOH CAH TOA', 'sin = opposite/hypotenuse, cos = adjacent/hypotenuse, tan = opposite/adjacent.'],
+  ['Cofunctions', 'sin A = cos(90° − A). If sin x = cos y, then x + y = 90°.'],
+  ['Area with sine', 'Area = ½ab · sin C, using two sides and the angle between them.'],
+  ['Altitude to the hypotenuse', 'It makes similar triangles. altitude² = (one piece)(other piece) of the hypotenuse.'],
   ['Rigid motion', 'A reflection, rotation or translation. It keeps lengths, angles and area the same.'],
-  ['Dilation', 'Stretches or shrinks a figure by scale factor k. Lengths ×k, area ×k². Angles stay the same.']
+  ['Rotation rules', '90° counterclockwise: (x, y) → (−y, x). 180°: (x, y) → (−x, −y).'],
+  ['Dilation', 'Stretches or shrinks by scale factor k. Lengths ×k, area ×k². A line through the center maps onto itself.'],
+  ['Partitioning a segment', 'For ratio a:b from P, go a/(a + b) of the way: P + a/(a+b)·(change in x, change in y).'],
+  ['Triangle inequality', 'The third side is between (difference) and (sum) of the other two sides.'],
+  ['Tangent–secant', '(tangent)² = (outside piece) × (whole secant). A tangent is perpendicular to the radius.'],
+  ['Arc length', '(central angle ÷ 360) × 2πr'],
+  ['Circle equation', '(x − h)² + (y − k)² = r². Complete the square to find the center (h, k) and radius r.'],
+  ['Cone and pyramid volume', 'V = ⅓Bh. Spinning a right triangle around a leg makes a cone.'],
+  ['Density', 'mass = density × volume. Round DOWN when counting how many whole objects you can make.']
 ];
 
 /* ---------- speed round ---------- */
@@ -586,17 +941,23 @@ const TF = [
   ['Every rectangle is a parallelogram.', true], ['The diagonals of every parallelogram are congruent.', false],
   ['The diagonals of a rhombus are perpendicular.', true], ['Consecutive angles of a parallelogram are congruent.', false],
   ['Opposite angles of a parallelogram are congruent.', true], ['The diagonals of a parallelogram bisect each other.', true],
-  ['The diagonals of a rectangle bisect each other.', true], ['The diagonals of a rectangle always bisect its angles.', false],
-  ['The diagonals of a rhombus bisect its angles.', true], ['All four sides of every rectangle are congruent.', false],
-  ['Opposite sides of a parallelogram are parallel.', true], ['A reflection changes the area of a figure.', false],
+  ['The diagonals of a rectangle always bisect its angles.', false], ['The diagonals of a rhombus bisect its angles.', true],
+  ['All four sides of every rectangle are congruent.', false], ['A reflection changes the area of a figure.', false],
   ['A dilation with scale factor 3 triples the area.', false], ['A translation preserves distance.', true],
-  ['A midsegment of a triangle is half as long as the third side.', true], ['A midsegment is perpendicular to the third side.', false],
-  ['sin = opposite ÷ hypotenuse', true], ['cos = opposite ÷ adjacent', false],
+  ['A midsegment of a triangle is half as long as the third side.', true], ['sin = opposite ÷ hypotenuse', true], ['cos = opposite ÷ adjacent', false],
   ['A 180° rotation about the diagonals\' intersection maps a parallelogram onto itself.', true],
   ['A 90° rotation about its center maps any rectangle onto itself.', false],
   ['A square has 4 lines of symmetry.', true], ['The angles of a quadrilateral add up to 360°.', true],
-  ['Every parallelogram is a rectangle.', false], ['Consecutive angles of a parallelogram add to 180°.', true],
-  ['SSA proves two triangles are congruent.', false], ['If a quadrilateral\'s diagonals bisect each other, it is a parallelogram.', true]
+  ['Consecutive angles of a parallelogram add to 180°.', true], ['SSA proves two triangles are congruent.', false],
+  ['AAA proves two triangles are congruent.', false], ['SSS proves two triangles are congruent.', true],
+  ['If a quadrilateral\'s diagonals bisect each other, it is a parallelogram.', true],
+  ['A tangent is perpendicular to the radius at the point of tangency.', true],
+  ['A regular hexagon carries onto itself after a 120° rotation.', true],
+  ['A plane section of a rectangular prism can be an octagon.', false],
+  ['A triangle can have sides 12, 30 and 18.', false],
+  ['Spinning a right triangle around one leg makes a cylinder.', false],
+  ['Dilating a line about a point on that line gives the same line.', true],
+  ['sin 30° = cos 60°', true], ['△ABC ≅ △DEF means ∠A ≅ ∠E.', false]
 ];
 
 /* ---------- proofs ---------- */
@@ -612,9 +973,12 @@ const R = {
   vert: 'Vertical angles are congruent',
   sss: 'SSS',
   sas: 'SAS',
-  corr: 'Parallel lines cut by a transversal form congruent corresponding angles',
-  oppAng: 'Opposite angles of a parallelogram are congruent',
-  defMid: 'Definition of midpoint'
+  repeat: 'Same steps with the other diagonal (ASA, then CPCTC)',
+  isoBase: 'Base angles of an isosceles triangle are congruent',
+  perpRight: 'Perpendicular lines form right angles',
+  rightCong: 'All right angles are congruent',
+  aa: 'AA similarity',
+  simProp: 'Corresponding sides of similar triangles are proportional'
 };
 const PROOFS = [
   { title: 'Diagonals bisect each other', from: 'Activity 3, question 11', fig: 'wxyz',
@@ -629,16 +993,40 @@ const PROOFS = [
       [s('WP') + ' ≅ ' + s('YP') + ' and ' + s('XP') + ' ≅ ' + s('ZP'), 'cpctc'],
       [s('WY') + ' and ' + s('XZ') + ' bisect each other', 'defBisect']
     ] },
-  { title: 'Opposite sides are congruent', from: 'Synthesis: use a diagonal', fig: 'abcd',
-    given: 'ABCD is a parallelogram with diagonal ' + s('AC') + '.',
-    prove: s('AB') + ' ≅ ' + s('CD') + ' and ' + s('BC') + ' ≅ ' + s('DA') + '.',
+  { title: 'Opposite sides are congruent', from: 'Amplify: Go With the Flow', fig: 'qrst',
+    given: 'QRST is a parallelogram with diagonal ' + s('SQ') + '.',
+    prove: s('RQ') + ' ≅ ' + s('TS') + ' and ' + s('RS') + ' ≅ ' + s('TQ') + '.',
     steps: [
-      ['ABCD is a parallelogram', 'given'],
-      [s('AB') + ' ∥ ' + s('CD') + ' and ' + s('BC') + ' ∥ ' + s('DA'), 'defPara'],
-      ['∠BAC ≅ ∠DCA and ∠BCA ≅ ∠DAC', 'altInt'],
-      [s('AC') + ' ≅ ' + s('CA'), 'reflex'],
-      ['△ABC ≅ △CDA', 'asa'],
-      [s('AB') + ' ≅ ' + s('CD') + ' and ' + s('BC') + ' ≅ ' + s('DA'), 'cpctc']
+      ['QRST is a parallelogram', 'given'],
+      [s('RQ') + ' ∥ ' + s('ST') + ' and ' + s('RS') + ' ∥ ' + s('QT'), 'defPara'],
+      ['∠RQS ≅ ∠TSQ and ∠RSQ ≅ ∠TQS', 'altInt'],
+      [s('SQ') + ' ≅ ' + s('QS'), 'reflex'],
+      ['△SRQ ≅ △QTS', 'asa'],
+      [s('RQ') + ' ≅ ' + s('TS') + ' and ' + s('RS') + ' ≅ ' + s('TQ'), 'cpctc']
+    ] },
+  { title: 'Opposite angles are congruent', from: 'Amplify: Opposite Angles Conjecture', fig: 'qrst',
+    given: 'QRST is a parallelogram.',
+    prove: '∠R ≅ ∠T and ∠Q ≅ ∠S.',
+    steps: [
+      ['QRST is a parallelogram', 'given'],
+      [s('RQ') + ' ∥ ' + s('ST') + ' and ' + s('RS') + ' ∥ ' + s('QT'), 'defPara'],
+      ['∠RQS ≅ ∠TSQ and ∠RSQ ≅ ∠TQS', 'altInt'],
+      [s('SQ') + ' ≅ ' + s('QS'), 'reflex'],
+      ['△SRQ ≅ △QTS', 'asa'],
+      ['∠R ≅ ∠T', 'cpctc'],
+      ['Draw diagonal ' + s('RT') + ': △RQT ≅ △TSR, so ∠Q ≅ ∠S', 'repeat']
+    ] },
+  { title: 'Proportional sides (Regents #34)', from: 'June ’26 Regents, Part III', fig: 'q34',
+    given: '△ABC, ' + s('AB') + ' ≅ ' + s('AC') + ', ' + s('DE') + ' ⊥ ' + s('BC') + ', ' + s('HF') + ' ⊥ ' + s('BC'),
+    prove: 'DE/BE = HF/CF',
+    steps: [
+      [s('AB') + ' ≅ ' + s('AC'), 'given'],
+      ['∠B ≅ ∠C', 'isoBase'],
+      [s('DE') + ' ⊥ ' + s('BC') + ' and ' + s('HF') + ' ⊥ ' + s('BC'), 'given'],
+      ['∠DEB and ∠HFC are right angles', 'perpRight'],
+      ['∠DEB ≅ ∠HFC', 'rightCong'],
+      ['△DEB ~ △HFC', 'aa'],
+      ['DE/BE = HF/CF', 'simProp']
     ] }
 ];
 
@@ -654,11 +1042,13 @@ const PROPS = [
 /* ---------- helpers & saved progress ---------- */
 const $ = id => document.getElementById(id);
 const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-let store = { xp: 0, best: 0, speedBest: 0 };
+let store = { xp: 0, best: 0, speedBest: 0, solved: [] };
 try { const v = JSON.parse(localStorage.getItem('geometry-study') || 'null'); if (v) store = Object.assign(store, v); } catch (e) {}
+if (!Array.isArray(store.solved)) store.solved = [];
 const save = () => { try { localStorage.setItem('geometry-study', JSON.stringify(store)); } catch (e) {} };
 const RANKS = ['Point', 'Segment', 'Ray', 'Angle', 'Triangle', 'Rhombus', 'Parallelogram Pro', 'Proof Master', 'Regents Ready'];
 let streak = 0;
+const srcOf = q => q.set === 'exam' ? `${EX} #${q.n}` : q.src;
 
 function renderStats() {
   const lvl = Math.min(Math.floor(store.xp / 150), RANKS.length - 1);
@@ -668,29 +1058,37 @@ function renderStats() {
   $('best').textContent = store.best;
   $('cardMeta').textContent = CARDS.length + ' cards';
   $('speedMeta').textContent = store.speedBest ? '60 seconds · best ' + store.speedBest : '60 seconds';
+  $('m-proof').textContent = PROOFS.length + ' proofs';
+  $('m-work').textContent = `${WORK.length} problems · ${store.solved.length} solved`;
 }
 function addXP(n) { store.xp += n; save(); renderStats(); }
 function hit() { streak++; if (streak > store.best) { store.best = streak; save(); } }
 function miss() { streak = 0; }
 
-const VIEWS = ['home', 'quiz', 'cards', 'speed', 'proof'];
+const VIEWS = ['home', 'quiz', 'cards', 'speed', 'proof', 'work'];
 function show(v) { VIEWS.forEach(x => $(x).hidden = x !== v); window.scrollTo(0, 0); if (v === 'home') renderStats(); }
 document.querySelectorAll('[data-home]').forEach(b => b.onclick = () => { stopSpeed(); show('home'); });
 document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
 
+const MODES = {
+  para: ['Parallelogram Quiz', () => shuffle(Q.filter(q => q.set === 'para')).slice(0, 10)],
+  cong: ['Congruence & Moves', () => shuffle(Q.filter(q => q.set === 'cong')).slice(0, 10)],
+  exam: ['Regents Part I', () => Q.filter(q => q.set === 'exam')],
+  mixed: ['Mixed Review', () => shuffle(Q.slice()).slice(0, 15)]
+};
 function go(mode) {
-  if (mode === 'para') startQuiz('Parallelogram Quiz', shuffle(Q.filter(q => q.set === 'para')).slice(0, 10));
-  if (mode === 'regents') startQuiz('Regents Practice', Q.filter(q => q.set === 'real').concat(shuffle(Q.filter(q => q.set === 'regents'))));
-  if (mode === 'mixed') startQuiz('Mixed Review', shuffle(Q.slice()).slice(0, 12));
+  if (MODES[mode]) startQuiz(mode);
   if (mode === 'cards') startCards();
   if (mode === 'speed') startSpeed();
   if (mode === 'proof') startProofPick();
+  if (mode === 'work') startWork();
 }
 
 /* ---------- quiz ---------- */
 let S = null;
-function startQuiz(title, list) {
-  S = { title, list, i: 0, right: 0, missed: [], locked: false, mode: title };
+function startQuiz(mode) {
+  const [title, make] = MODES[mode];
+  S = { mode, title, list: make(), i: 0, right: 0, missed: [], locked: false };
   $('qTitle').textContent = title;
   $('qStage').hidden = false; $('qEnd').hidden = true;
   show('quiz'); renderQ();
@@ -700,7 +1098,7 @@ function renderQ() {
   S.locked = false;
   $('qProg').style.width = (S.i / S.list.length * 100) + '%';
   $('qCount').textContent = `${S.i + 1} / ${S.list.length}`;
-  $('qTags').innerHTML = `<span class="chip">${q.topic}</span><span class="chip ${q.set === 'real' ? 'real' : 'src'}">${q.src}</span>`;
+  $('qTags').innerHTML = `<span class="chip">${q.topic}</span><span class="chip ${q.set === 'exam' ? 'real' : 'src'}">${srcOf(q)}</span>`;
   $('qText').innerHTML = q.q;
   $('qFig').innerHTML = q.fig ? FIG[q.fig] : ''; $('qFig').hidden = !q.fig;
   $('qChoices').innerHTML = q.c.map((c, k) => `<button class="choice" data-k="${k}"><span class="num">(${k + 1})</span><span>${c}</span></button>`).join('');
@@ -711,8 +1109,7 @@ function pick(k) {
   if (!S || S.locked) return;
   S.locked = true;
   const q = S.list[S.i], ok = k === q.a;
-  const btns = $('qChoices').querySelectorAll('.choice');
-  btns.forEach((b, i) => { b.disabled = true; if (i === q.a) b.classList.add('right'); else if (i === k) b.classList.add('wrong'); });
+  $('qChoices').querySelectorAll('.choice').forEach((b, i) => { b.disabled = true; if (i === q.a) b.classList.add('right'); else if (i === k) b.classList.add('wrong'); });
   if (ok) { S.right++; hit(); addXP(10 + Math.min(streak, 5) * 2); } else { miss(); S.missed.push(q); }
   const fb = $('qFeedback');
   fb.className = 'feedback ' + (ok ? 'ok' : 'no');
@@ -727,16 +1124,73 @@ function endQuiz() {
   $('qProg').style.width = '100%';
   const n = S.list.length, r = S.right, pct = r / n;
   const msg = pct === 1 ? 'Perfect score. You are Regents ready!' : pct >= 0.8 ? 'Great job. Look over the few you missed.' : pct >= 0.6 ? 'Good start. Review the misses below and try again.' : 'Keep going. Read the explanations below, then run it again.';
+  const credits = S.mode === 'exam' ? `<p class="mono">${r * 2} of 48 Part I credits</p>` : '';
   const end = $('qEnd');
   end.innerHTML = `<div class="chips"><span class="chip">${S.title}</span></div>
-    <div class="big mono">${r}/${n}</div><p>${msg}</p>
-    <div class="row"><button class="btn pop" id="again">Try again</button><button class="btn ghost" data-home2>All modes</button></div>
-    ${S.missed.length ? `<div class="missed"><div class="section-label" style="margin:8px 0 0">Review what you missed</div>${S.missed.map(q => `<div class="m"><div>${q.q}</div><div class="a">Answer: (${q.a + 1}) ${q.c[q.a]}</div><div>${q.ex}</div></div>`).join('')}</div>` : ''}`;
+    <div class="big mono">${r}/${n}</div>${credits}<p>${msg}</p>
+    <div class="row"><button class="btn pop" id="again">Try again</button><button class="btn ghost" id="endHome">All modes</button></div>
+    ${S.missed.length ? `<div class="missed"><div class="section-label" style="margin:8px 0 0">Review what you missed</div>${S.missed.map(q => `<div class="m"><div><b>${srcOf(q)}:</b> ${q.q}</div><div class="a">Answer: (${q.a + 1}) ${q.c[q.a]}</div><div>${q.ex}</div></div>`).join('')}</div>` : ''}`;
   $('qStage').hidden = true; end.hidden = false;
-  $('again').onclick = () => go({ 'Parallelogram Quiz': 'para', 'Regents Practice': 'regents', 'Mixed Review': 'mixed' }[S.title]);
-  end.querySelector('[data-home2]').onclick = () => show('home');
+  $('again').onclick = () => startQuiz(S.mode);
+  $('endHome').onclick = () => show('home');
   if (pct >= 0.8) confetti();
 }
+
+/* ---------- written response (Parts II–IV) ---------- */
+let W = 0;
+const wid = w => String(w.n);
+function startWork(i) {
+  if (typeof i === 'number') W = i;
+  else { const first = WORK.findIndex(w => !store.solved.includes(wid(w))); W = first < 0 ? 0 : first; }
+  show('work'); renderWork();
+}
+function renderWork() {
+  const w = WORK[W];
+  $('wkCount').textContent = `${store.solved.length} / ${WORK.length} done`;
+  $('wkJump').innerHTML = WORK.map((x, i) => `<button class="${i === W ? 'cur' : ''} ${store.solved.includes(wid(x)) ? 'done' : ''}" data-i="${i}" aria-label="Question ${x.n}">${x.n}</button>`).join('');
+  $('wkJump').querySelectorAll('button').forEach(b => b.onclick = () => { W = +b.dataset.i; renderWork(); });
+  $('wkTags').innerHTML = `<span class="chip real">${EX} #${w.n}</span><span class="chip src">Part ${w.part} · ${w.cr} credits</span><span class="chip">${w.topic}</span>`;
+  $('wkText').innerHTML = w.q;
+  $('wkFig').innerHTML = w.fig ? FIG[w.fig] : ''; $('wkFig').hidden = !w.fig;
+  const answerable = w.type === 'num' || w.type === 'pt';
+  $('wkAnsRow').hidden = !answerable;
+  $('wkInput').value = ''; $('wkVerdict').textContent = ''; $('wkVerdict').className = 'verdict';
+  $('wkInput').placeholder = w.type === 'pt' ? '(x, y)' : 'number';
+  $('wkInput').inputMode = w.type === 'pt' ? 'text' : 'decimal';
+  $('wkUnit').textContent = w.unit || '';
+  $('wkShow').textContent = answerable ? 'Show solution' : 'Show model answer';
+  $('wkSol').hidden = true;
+  $('wkSol').innerHTML = `<h4>Worked solution</h4>${w.solFig ? `<div class="fig">${FIG[w.solFig]}</div>` : ''}<ol>${w.steps.map(t => `<li>${t}</li>`).join('')}</ol><p class="final">${w.final}</p>
+    ${answerable ? '' : `<div class="row"><button class="btn" id="wkGot">I wrote this</button></div>`}`;
+  const got = $('wkGot'); if (got) got.onclick = () => { markSolved(w, 10); got.disabled = true; got.textContent = 'Marked done'; };
+  $('wkPrev').disabled = W === 0; $('wkNext').textContent = W === WORK.length - 1 ? 'Back to all modes' : 'Next problem →';
+}
+function markSolved(w, xp) {
+  if (!store.solved.includes(wid(w))) { store.solved.push(wid(w)); addXP(xp); }
+  save(); $('wkCount').textContent = `${store.solved.length} / ${WORK.length} done`;
+  const b = $('wkJump').querySelector(`[data-i="${W}"]`); if (b) b.classList.add('done');
+  if (store.solved.length === WORK.length) confetti();
+}
+function checkWork() {
+  const w = WORK[W], raw = $('wkInput').value.trim();
+  if (!raw) { $('wkVerdict').textContent = 'Type an answer first.'; $('wkVerdict').className = 'verdict'; return; }
+  let ok = false;
+  if (w.type === 'num') {
+    const v = parseFloat(raw.replace(/[^0-9.\-]/g, ''));
+    ok = !isNaN(v) && Math.abs(v - w.ans) <= w.tol;
+  } else {
+    const m = raw.replace(/[()\s]/g, '').replace(/[−–]/g, '-').split(',').map(Number);
+    ok = m.length === 2 && m[0] === w.ans[0] && m[1] === w.ans[1];
+  }
+  const v = $('wkVerdict');
+  if (ok) { v.textContent = 'Correct! Now check your work against the solution.'; v.className = 'verdict ok'; hit(); markSolved(w, 20); }
+  else { v.textContent = 'Not yet. Check your steps, or open the solution.'; v.className = 'verdict no'; miss(); }
+}
+$('wkCheck').onclick = checkWork;
+$('wkInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); checkWork(); } });
+$('wkShow').onclick = () => { $('wkSol').hidden = false; };
+$('wkPrev').onclick = () => { if (W > 0) { W--; renderWork(); } };
+$('wkNext').onclick = () => { if (W < WORK.length - 1) { W++; renderWork(); window.scrollTo(0, 0); } else show('home'); };
 
 /* ---------- flashcards ---------- */
 let F = null;
@@ -842,6 +1296,7 @@ function renderProof() {
   $('pfAsk').querySelectorAll('[data-r]').forEach(b => b.onclick = () => {
     if (b.dataset.r === right) {
       b.classList.add('right'); hit(); addXP(5);
+      $('pfAsk').querySelectorAll('[data-r]').forEach(x => x.disabled = true);
       setTimeout(() => { PF.step++; renderProof(); }, 450);
     } else {
       b.classList.add('wrong'); b.disabled = true; PF.mistakes++; miss();
@@ -851,6 +1306,7 @@ function renderProof() {
 
 /* ---------- keyboard ---------- */
 document.addEventListener('keydown', e => {
+  if (e.target && e.target.tagName === 'INPUT') return;
   if (!$('quiz').hidden && !$('qStage').hidden) {
     if (/^[1-4]$/.test(e.key)) pick(+e.key - 1);
     else if (e.key === 'Enter' && S && S.locked && document.activeElement !== $('qNext')) $('qNext').click();
